@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Photo Gallery — Warkari Flood Emergency Response | Samarthya Kalyankari Sanstha</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --maroon:#8B0000;
+    --maroon-deep:#5C0000;
+    --maroon-bright:#A8241E;
+    --linen:#FDFBF7;
+    --linen-card:#FFF8EE;
+    --ink:#2A2320;
+    --muted:#7A6E60;
+    --hairline:#E4D9C6;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--linen); color:var(--ink);
+    font-family:'Source Sans 3',sans-serif;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    background:linear-gradient(120deg, var(--maroon-deep) 0%, var(--maroon) 55%, var(--maroon-bright) 100%);
+    color:#fff;
+    padding:28px 24px 24px;
+    text-align:center;
+  }
+  header .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    opacity:.82; margin-bottom:8px;
+  }
+  header h1{
+    font-family:'Fraunces',serif; font-weight:700; font-style:italic;
+    font-size:clamp(24px,4.5vw,38px); margin:0 0 8px;
+  }
+  header p{
+    font-size:13.5px; opacity:.88; max-width:620px; margin:0 auto;
+    line-height:1.6;
+  }
+  header .stats{
+    display:flex; justify-content:center; gap:0; margin-top:18px; flex-wrap:wrap;
+  }
+  header .stats .stat{
+    padding:4px 18px; border-right:1px solid rgba(255,255,255,0.25);
+    font-family:'IBM Plex Mono',monospace; font-size:12px;
+  }
+  header .stats .stat:last-child{ border-right:none; }
+  header .stats .stat b{ font-family:'Fraunces',serif; font-size:16px; display:block; }
+
+  /* ---------- GROUP NAV ---------- */
+  .group-nav{
+    position:sticky; top:0; z-index:100;
+    background:var(--linen); border-bottom:1px solid var(--hairline);
+    display:flex; justify-content:center; gap:6px; flex-wrap:wrap;
+    padding:10px 14px;
+  }
+  .group-nav a{
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    text-decoration:none; color:var(--maroon);
+    border:1px solid var(--hairline); border-radius:20px;
+    padding:7px 14px; white-space:nowrap;
+    transition:background .15s ease;
+  }
+  .group-nav a:hover{ background:var(--linen-card); }
+
+  /* ---------- GROUPS & SECTIONS ---------- */
+  .group{ padding:36px 0 8px; }
+  .group-head{
+    max-width:900px; margin:0 auto 20px; padding:0 24px;
+  }
+  .group-head .g-label{
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+  }
+  .group-head h2{
+    font-family:'Fraunces',serif; font-weight:700; font-size:24px;
+    color:var(--maroon); margin:4px 0 0;
+  }
+
+  .category{
+    max-width:1100px; margin:0 auto; padding:22px 24px 8px;
+  }
+  .category-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    flex-wrap:wrap; gap:8px; margin-bottom:12px;
+    border-bottom:1px solid var(--hairline); padding-bottom:10px;
+  }
+  .category-head h3{
+    font-family:'Fraunces',serif; font-weight:700; font-size:18px; margin:0;
+  }
+  .category-head .count{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted);
+    background:var(--linen-card); border:1px solid var(--hairline);
+    border-radius:12px; padding:3px 10px;
+  }
+  .category-sub{
+    font-size:13px; color:var(--muted); margin:0 0 16px; max-width:700px; line-height:1.55;
+  }
+
+  /* ---------- MASONRY GRID ---------- */
+  .grid{
+    column-count:4; column-gap:10px;
+  }
+  @media (max-width:900px){ .grid{ column-count:3; } }
+  @media (max-width:600px){ .grid{ column-count:2; } }
+
+  .grid-item{
+    break-inside:avoid; margin-bottom:10px; border-radius:6px; overflow:hidden;
+    cursor:pointer; position:relative; background:var(--linen-card);
+    box-shadow:0 1px 3px rgba(0,0,0,0.12);
+  }
+  .grid-item img{
+    width:100%; height:auto; display:block;
+    opacity:0; transition:opacity .4s ease;
+  }
+  .grid-item img.loaded{ opacity:1; }
+  .grid-item:hover{ box-shadow:0 4px 14px rgba(0,0,0,0.22); }
+
+  /* ---------- LIGHTBOX ---------- */
+  .lightbox{
+    position:fixed; inset:0; background:rgba(20,10,8,0.92);
+    z-index:2000; display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+  .lightbox.open{ opacity:1; pointer-events:auto; }
+  .lightbox img{
+    max-width:92vw; max-height:86vh; object-fit:contain;
+    border-radius:6px; box-shadow:0 30px 80px rgba(0,0,0,0.6);
+  }
+  .lightbox .lb-close{
+    position:absolute; top:18px; right:22px; width:38px; height:38px;
+    border-radius:50%; background:rgba(255,255,255,0.15); color:#fff;
+    border:none; font-size:18px; cursor:pointer;
+  }
+  .lightbox .lb-nav{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:46px; height:46px; border-radius:50%;
+    background:rgba(255,255,255,0.15); color:#fff; border:none;
+    font-size:20px; cursor:pointer;
+  }
+  .lightbox .lb-prev{ left:16px; }
+  .lightbox .lb-next{ right:16px; }
+  .lightbox .lb-counter{
+    position:absolute; bottom:18px; left:0; right:0; text-align:center;
+    font-family:'IBM Plex Mono',monospace; color:#fff; font-size:12px; opacity:.75;
+  }
+
+  footer{
+    text-align:center; padding:30px 20px 40px; color:var(--muted);
+    font-size:12px; font-family:'IBM Plex Mono',monospace;
+    border-top:1px solid var(--hairline); margin-top:20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Samarthya Kalyankari Sanstha · Warkari Flood Emergency Response, July 2026</div>
+  <h1>Photo Gallery</h1>
+  <p>104 field photographs organized by the operation's own arc — the crisis, the accountability trail, and the people it was for. Donor-branded photos and beneficiary registration documents are kept out of this public gallery by design.</p>
+  <div class="stats" id="headerStats"></div>
+</header>
+
+<nav class="group-nav">
+  <a href="#group-emergency">Emergency, Logistics &amp; Route</a>
+  <a href="#group-verification">Verification &amp; Accountability</a>
+  <a href="#group-impact">Human Impact &amp; Credits</a>
+</nav>
+
+<main id="main"></main>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose">✕</button>
+  <button class="lb-nav lb-prev" id="lbPrev">‹</button>
+  <img id="lbImg" src="" alt="">
+  <button class="lb-nav lb-next" id="lbNext">›</button>
+  <div class="lb-counter" id="lbCounter"></div>
+</div>
+
+<footer>
+  Samarthya Kalyankari Sanstha · Amazon, through DonateKart Foundation · Warkari Flood Emergency Response, July 2026
+</footer>
+
+<script>
+const GROUPS = [
+  { id: 'group-emergency', label: 'Group A — Emergency, Logistics & Route', slugs: ['when-rains-came','transportation','samarthya-team-demo'] },
+  { id: 'group-verification', label: 'Group B — Verification & Accountability', slugs: ['dindi-schedule-scans','beneficiaries-with-kits'] },
+  { id: 'group-impact', label: 'Group C — Human Impact & Credits', slugs: ['what-a-kit-became','human-smiles','team-credits'] },
+];
+
+let manifest = null;
+let flatPhotos = []; // for lightbox nav: [{catSlug, idx}]
+let currentFlatIndex = 0;
+
+async function init(){
+  const res = await fetch('manifest.json');
+  manifest = await res.json();
+
+  const totalPhotos = manifest.categories.reduce((s,c) => s + c.count, 0);
+  document.getElementById('headerStats').innerHTML = `
+    <div class="stat"><b>${totalPhotos}</b>photos</div>
+    <div class="stat"><b>${manifest.categories.length}</b>categories</div>
+    <div class="stat"><b>3</b>groups</div>
+  `;
+
+  const main = document.getElementById('main');
+  const byslug = {};
+  manifest.categories.forEach(c => byslug[c.slug] = c);
+
+  GROUPS.forEach(group => {
+    const section = document.createElement('section');
+    section.className = 'group';
+    section.id = group.id;
+    const head = document.createElement('div');
+    head.className = 'group-head';
+    head.innerHTML = `<div class="g-label">${group.label.split(' — ')[0]}</div><h2>${group.label.split(' — ')[1]}</h2>`;
+    section.appendChild(head);
+
+    group.slugs.forEach(slug => {
+      const cat = byslug[slug];
+      if (!cat) return;
+      const catEl = document.createElement('div');
+      catEl.className = 'category';
+      catEl.innerHTML = `
+        <div class="category-head">
+          <h3>${cat.title}</h3>
+          <span class="count">${cat.count} photo${cat.count!==1?'s':''}</span>
+        </div>
+        <p class="category-sub">${cat.subtitle}</p>
+        <div class="grid" id="grid-${cat.slug}"></div>
+      `;
+      section.appendChild(catEl);
+    });
+    main.appendChild(section);
+  });
+
+  // populate grids + build flat photo list for lightbox
+  manifest.categories.forEach(cat => {
+    const grid = document.getElementById(`grid-${cat.slug}`);
+    cat.photos.forEach((photo, i) => {
+      const item = document.createElement('div');
+      item.className = 'grid-item';
+      const img = document.createElement('img');
+      img.src = photo.thumb;
+      img.loading = 'lazy';
+      img.alt = `${cat.title} photo ${i+1}`;
+      img.addEventListener('load', () => img.classList.add('loaded'));
+      item.appendChild(img);
+      const flatIdx = flatPhotos.length;
+      flatPhotos.push({ catSlug: cat.slug, catTitle: cat.title, full: photo.full, idx: i });
+      item.addEventListener('click', () => openLightbox(flatIdx));
+      grid.appendChild(item);
+    });
+  });
+}
+
+// ---------- LIGHTBOX ----------
+const lightbox = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+const lbCounter = document.getElementById('lbCounter');
+
+function openLightbox(flatIdx){
+  currentFlatIndex = flatIdx;
+  renderLightbox();
+  lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function renderLightbox(){
+  const p = flatPhotos[currentFlatIndex];
+  lbImg.src = p.full;
+  lbImg.alt = p.catTitle;
+  lbCounter.textContent = `${p.catTitle} — ${p.idx+1} / ${flatPhotos.filter(x=>x.catSlug===p.catSlug).length}`;
+}
+function closeLightbox(){
+  lightbox.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function navLightbox(dir){
+  // navigate within same category only, wrapping
+  const cur = flatPhotos[currentFlatIndex];
+  const sameCat = flatPhotos.map((p,i)=>({...p,i})).filter(p => p.catSlug === cur.catSlug);
+  const posInCat = sameCat.findIndex(p => p.i === currentFlatIndex);
+  const nextPos = (posInCat + dir + sameCat.length) % sameCat.length;
+  currentFlatIndex = sameCat[nextPos].i;
+  renderLightbox();
+}
+document.getElementById('lbClose').addEventListener('click', closeLightbox);
+document.getElementById('lbPrev').addEventListener('click', () => navLightbox(-1));
+document.getElementById('lbNext').addEventListener('click', () => navLightbox(1));
+lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', (e) => {
+  if (!lightbox.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') navLightbox(-1);
+  if (e.key === 'ArrowRight') navLightbox(1);
+});
+
+init();
+</script>
+</body>
+</html>

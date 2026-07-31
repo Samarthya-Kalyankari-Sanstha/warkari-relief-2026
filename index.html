@@ -23,7 +23,7 @@
   --navy-deep:#161D28;
   --navy-lt:#E9EDF3;
   --orange:#FF9900;      /* Amazon orange — accent */
-  --orange-dp:#CC7A00;
+  --orange-dp:#92400E; /* darkened from #CC7A00 for WCAG AA text contrast (3.3:1 -> 7.1:1 on white) */
   --samarthya-red:#D2232A; /* small accent, from Samarthya's own logo mark only */
   --donatekart-blue:#0069FF; /* small accent, from DonateKart's own logo only */
   --day1:#E67E22; /* matches the route map's Day 1 amber */
@@ -36,6 +36,7 @@
   --r:12px;
 }
 *{box-sizing:border-box;}
+:focus-visible{outline:2px solid #1B2A4A;outline-offset:2px;}
 html{scroll-behavior:smooth;}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'Work Sans',sans-serif;font-size:15px;line-height:1.65;}
 img{max-width:100%;}
@@ -132,7 +133,7 @@ img{max-width:100%;}
 h1.headline{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(26px,4.2vw,42px);color:var(--navy);margin:8px 0 14px;line-height:1.15;}
 p.lede{font-size:17px;max-width:740px;color:var(--text);}
 
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:28px 0;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:48px 0 32px;}
 .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 15px;}
 .stat .num{font-family:'Fraunces',serif;font-weight:700;font-size:29px;color:var(--navy);}
 .stat .lbl{font-size:12.5px;font-weight:600;margin-top:2px;}
@@ -187,6 +188,9 @@ h2.sec{font-family:'Fraunces',serif;font-weight:700;font-size:22px;color:var(--n
   border:1px solid var(--border);
   padding:6px;
 }
+/* Portrait variant — sources are pre-cropped to 3:4, so cover adds no further crop. */
+.strip.strip-portrait{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+.strip.strip-portrait img{aspect-ratio:3/4;}
 
 /* ---------- other tabs (lighter pass, structure only) ---------- */
 .quote-card{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--orange);border-radius:var(--r);padding:20px 22px;margin:14px 0;}
@@ -243,7 +247,14 @@ table.roster td:last-child{color:var(--muted);}
   background:var(--card);
   border-right:1px solid var(--border);
   padding:18px 18px 24px;
+  -webkit-mask-image:linear-gradient(to bottom, black calc(100% - 28px), transparent 100%);
+  mask-image:linear-gradient(to bottom, black calc(100% - 28px), transparent 100%);
+  scrollbar-width:thin;
+  scrollbar-color:var(--muted) transparent;
 }
+.route-sidebar::-webkit-scrollbar{width:6px;}
+.route-sidebar::-webkit-scrollbar-track{background:transparent;}
+.route-sidebar::-webkit-scrollbar-thumb{background:var(--muted);border-radius:3px;}
 .route-sidebar h4{font-family:'Fraunces',serif;font-weight:700;font-size:14.5px;color:var(--navy);margin:18px 0 8px;}
 .route-sidebar h4:first-child{margin-top:0;}
 .route-map-panel{flex:1;position:relative;}
@@ -329,7 +340,8 @@ table.roster td:last-child{color:var(--muted);}
 .bene-attr .who .mr-name{font-family:'Noto Sans Devanagari',sans-serif;font-weight:600;}
 .bene-kit-badge{
   font-family:'Work Sans',sans-serif;font-size:10px;font-weight:700;
-  background:var(--orange);color:#fff;padding:4px 10px;border-radius:5px;white-space:nowrap;
+  background:rgba(217,119,6,0.12);color:#92400E;border:1px solid rgba(217,119,6,0.35);
+  padding:4px 10px;border-radius:5px;white-space:nowrap;
 }
 
 footer{text-align:center;padding:26px 18px 36px;color:var(--muted);font-size:11.5px;border-top:1px solid var(--border);margin-top:10px;}
@@ -355,11 +367,18 @@ footer{text-align:center;padding:26px 18px 36px;color:var(--muted);font-size:11.
   transition:transform .22s ease;
 }
 .lb.open .lb-img{transform:scale(1);}
+.lb-name{
+  color:#FFFFFF;font-family:'Fraunces',serif;font-weight:700;font-size:16px;
+  text-align:center;max-width:min(85vw,760px);margin-top:14px;
+  text-shadow:0 1px 4px rgba(0,0,0,.7);display:none;
+}
+.lb-name.show{display:block;}
 .lb-cap{
   color:#EDF0F4;font-family:'Work Sans',sans-serif;font-size:13px;line-height:1.5;
   text-align:center;max-width:min(85vw,760px);margin-top:14px;
   text-shadow:0 1px 4px rgba(0,0,0,.7);
 }
+.lb-name.show + .lb-cap{margin-top:6px;}
 .lb-close{
   position:absolute;top:18px;right:22px;
   width:44px;height:44px;border-radius:50%;
@@ -661,6 +680,23 @@ footer{text-align:center;padding:26px 18px 36px;color:var(--muted);font-size:11.
       <div class="bene-kit-badge">Tarpaulin &amp; Rope Kit</div>
     </div>
   </div>
+
+  <h2 class="sec" style="margin-top:38px;">Faces of the Wari</h2>
+  <p style="font-size:13px;color:var(--muted);max-width:740px;margin-top:-6px;">The testimonials above are attributed, sourced and labelled one by one. These ten photographs are the other half of that record — Warkaris the team met, sat with and talked to across the three days on the route. They are published as portraits rather than as quotations: the words on this page belong only to the people named beside them.</p>
+  <!-- Upgrade path: when a speaker's quote is WhatsApp-confirmed, add data-name="Name · Role · Village"
+       to that figure's <img>. The lightbox renders it automatically above the caption. -->
+  <div class="strip strip-portrait">
+    <figure><img loading="lazy" src="images/dash/voice-1.jpg" alt=""><figcaption>A Warkari in cap and gold-bordered shawl, hands clasped, among the group gathered at a halt</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/voice-2.jpg" alt=""><figcaption>A woman in glasses and an embroidered white dupatta, the rest of her group waiting behind her</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/voice-3.jpg" alt=""><figcaption>An older woman in a grey and crimson saree, photographed in the shade at a roadside halt</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/voice-4.jpg" alt=""><figcaption>A Warkari in white cap and shirt, phone tucked into his pocket for the road</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/voice-5.jpg" alt=""><figcaption>Speaking into a microphone during a field recording, orange sash across his shoulder</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/voice-6.jpg" alt=""><figcaption>An elder in tinted glasses and tulsi beads, resting out of the sun</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/voice-7.jpg" alt=""><figcaption>An elder seated beside his Dindi's flagstaff, cap and kurta still crisp after the walk</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/voice-8.jpg" alt=""><figcaption>A younger Warkari, the flags of his Dindi standing in the road behind him</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/voice-9.jpg" alt=""><figcaption>Resting on the ground with two flagstaffs across his shoulder and his pack still on</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/voice-10.jpg" alt=""><figcaption>A woman in a turquoise floral saree under the tent tarpaulin, her companions behind her</figcaption></figure>
+  </div>
 </div></section>
 
 <!-- ===== ACCOUNTABILITY (structure pass) ===== -->
@@ -802,6 +838,7 @@ footer{text-align:center;padding:26px 18px 36px;color:var(--muted);font-size:11.
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Enlarged photograph">
   <button class="lb-close" id="lbClose" aria-label="Close enlarged photo">&#10005;</button>
   <img class="lb-img" id="lbImg" src="" alt="">
+  <div class="lb-name" id="lbName"></div>
   <div class="lb-cap" id="lbCap"></div>
 </div>
 
@@ -813,12 +850,15 @@ footer{text-align:center;padding:26px 18px 36px;color:var(--muted);font-size:11.
   const lb    = document.getElementById('lb');
   const lbImg = document.getElementById('lbImg');
   const lbCap = document.getElementById('lbCap');
+  const lbName = document.getElementById('lbName');
   let lastFocused = null;
 
-  function openLB(src, caption, altText){
+  function openLB(src, caption, altText, name){
     lastFocused = document.activeElement;
     lbImg.src = src;
     lbImg.alt = altText || caption || '';
+    lbName.textContent = name || '';
+    lbName.classList.toggle('show', !!name);
     lbCap.textContent = caption || '';
     lb.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -836,7 +876,7 @@ footer{text-align:center;padding:26px 18px 36px;color:var(--muted);font-size:11.
   document.querySelectorAll('.strip img').forEach(img => {
     img.addEventListener('click', () => {
       const cap = img.closest('figure')?.querySelector('figcaption')?.textContent || '';
-      openLB(img.currentSrc || img.src, cap, img.alt);
+      openLB(img.currentSrc || img.src, cap, img.alt, img.dataset.name);
     });
   });
 

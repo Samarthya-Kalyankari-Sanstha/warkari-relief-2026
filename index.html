@@ -2,310 +2,896 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Photo Gallery — Warkari Flood Emergency Response | Samarthya Kalyankari Sanstha</title>
+<title>Samarthya — Warkari Flood Emergency Response 2026 | Impact Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,400&family=Work+Sans:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
-  :root{
-    --maroon:#8B0000;
-    --maroon-deep:#5C0000;
-    --maroon-bright:#A8241E;
-    --linen:#FDFBF7;
-    --linen-card:#FFF8EE;
-    --ink:#2A2320;
-    --muted:#7A6E60;
-    --hairline:#E4D9C6;
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0; background:var(--linen); color:var(--ink);
-    font-family:'Source Sans 3',sans-serif;
-  }
+:root{
+  /* ---- pulled directly from the real printed banners (pixel-verified) ---- */
+  --navy:#232F3E;        /* Amazon Squid Ink — dominant banner color */
+  --navy-deep:#161D28;
+  --navy-lt:#E9EDF3;
+  --orange:#FF9900;      /* Amazon orange — accent */
+  --orange-dp:#CC7A00;
+  --samarthya-red:#D2232A; /* small accent, from Samarthya's own logo mark only */
+  --donatekart-blue:#0069FF; /* small accent, from DonateKart's own logo only */
+  --day1:#E67E22; /* matches the route map's Day 1 amber */
+  --day2:#C0392B; /* matches the route map's Day 2 crimson */
+  --bg:#F7F9FC;
+  --card:#FFFFFF;
+  --text:#1B222C;
+  --muted:#6B7684;
+  --border:#DFE5EE;
+  --r:12px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Work Sans',sans-serif;font-size:15px;line-height:1.65;}
+img{max-width:100%;}
 
-  /* ---------- HEADER ---------- */
-  header{
-    background:linear-gradient(120deg, var(--maroon-deep) 0%, var(--maroon) 55%, var(--maroon-bright) 100%);
-    color:#fff;
-    padding:28px 24px 24px;
-    text-align:center;
-  }
-  header .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-    opacity:.82; margin-bottom:8px;
-  }
-  header h1{
-    font-family:'Fraunces',serif; font-weight:700; font-style:italic;
-    font-size:clamp(24px,4.5vw,38px); margin:0 0 8px;
-  }
-  header p{
-    font-size:13.5px; opacity:.88; max-width:620px; margin:0 auto;
-    line-height:1.6;
-  }
-  header .stats{
-    display:flex; justify-content:center; gap:0; margin-top:18px; flex-wrap:wrap;
-  }
-  header .stats .stat{
-    padding:4px 18px; border-right:1px solid rgba(255,255,255,0.25);
-    font-family:'IBM Plex Mono',monospace; font-size:12px;
-  }
-  header .stats .stat:last-child{ border-right:none; }
-  header .stats .stat b{ font-family:'Fraunces',serif; font-size:16px; display:block; }
+/* ---------- MASTHEAD ---------- */
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background-color:#FFFFFF; /* Updated plain white background, per latest spec */
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+.masthead{
+  background:var(--card);
+  display:flex;
+  justify-content:space-between; /* push left and right groups to outer edges */
+  align-items:center;
+  width:100%;
+  box-sizing:border-box;
+  padding:14px 32px; /* generous side padding */
+  flex-wrap:wrap;
+  gap:16px;
+}
+.mh-left,.mh-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.mh-left .partner-label{font-family:'Work Sans',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.06em;color:var(--muted);white-space:nowrap;}
+.mh-left .logo-plain{height:38px;width:auto;object-fit:contain;display:block;}
+.mh-left .prog{font-family:'Work Sans',sans-serif;font-size:12px;color:var(--muted);line-height:1.4;}
+.mh-left .prog b{font-family:'Fraunces',serif;font-weight:700;font-size:15px;color:var(--navy);display:block;}
+.mh-attr{display:flex;align-items:center;gap:8px;}
+.mh-attr .lbl{font-family:'Work Sans',sans-serif;font-size:11px;font-style:italic;color:var(--muted);}
+.mh-attr .logo-plain{height:32px;width:auto;object-fit:contain;display:block;}
+.mh-verified-pill{
+  background:var(--navy);color:#fff;font-family:'Work Sans',sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:.03em;
+  padding:5px 11px;border-radius:5px;white-space:nowrap;
+}
+.nav{background:#F0F2F5;border-bottom:1px solid var(--border);}
 
-  /* ---------- GROUP NAV ---------- */
-  .group-nav{
-    position:sticky; top:0; z-index:100;
-    background:var(--linen); border-bottom:1px solid var(--hairline);
-    display:flex; justify-content:center; gap:6px; flex-wrap:wrap;
-    padding:10px 14px;
-  }
-  .group-nav a{
-    font-family:'IBM Plex Mono',monospace; font-size:11px;
-    text-decoration:none; color:var(--maroon);
-    border:1px solid var(--hairline); border-radius:20px;
-    padding:7px 14px; white-space:nowrap;
-    transition:background .15s ease;
-  }
-  .group-nav a:hover{ background:var(--linen-card); }
 
-  /* ---------- GROUPS & SECTIONS ---------- */
-  .group{ padding:36px 0 8px; }
-  .group-head{
-    max-width:900px; margin:0 auto 20px; padding:0 24px;
-  }
-  .group-head .g-label{
-    font-family:'IBM Plex Mono',monospace; font-size:11px;
-    letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
-  }
-  .group-head h2{
-    font-family:'Fraunces',serif; font-weight:700; font-size:24px;
-    color:var(--maroon); margin:4px 0 0;
-  }
+/* ---------- TAB NAV ---------- */
+.nav{background:var(--bg);border-bottom:1px solid var(--border);}
+.nav-in{width:100%;box-sizing:border-box;display:flex;justify-content:center;gap:10px;overflow-x:auto;padding:12px 32px;scrollbar-width:none;}
+.nav-in::-webkit-scrollbar{display:none;}
+.nb{font-family:'Work Sans',sans-serif;font-weight:500;font-size:12.5px;white-space:nowrap;border:2px solid transparent;border-radius:20px;background:transparent;color:var(--text);padding:8px 16px;cursor:pointer;transition:all .15s ease;}
+.nb:hover{background:rgba(0,0,0,.04);}
+.nb.on{background:#fff;border-color:var(--orange);font-weight:700;color:var(--navy);}
 
-  .category{
-    max-width:1100px; margin:0 auto; padding:22px 24px 8px;
-  }
-  .category-head{
-    display:flex; justify-content:space-between; align-items:baseline;
-    flex-wrap:wrap; gap:8px; margin-bottom:12px;
-    border-bottom:1px solid var(--hairline); padding-bottom:10px;
-  }
-  .category-head h3{
-    font-family:'Fraunces',serif; font-weight:700; font-size:18px; margin:0;
-  }
-  .category-head .count{
-    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted);
-    background:var(--linen-card); border:1px solid var(--hairline);
-    border-radius:12px; padding:3px 10px;
-  }
-  .category-sub{
-    font-size:13px; color:var(--muted); margin:0 0 16px; max-width:700px; line-height:1.55;
-  }
+/* ---------- SECTIONS ---------- */
+.tab{display:none;animation:fu .3s ease;}
+.tab.on2{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px;}
 
-  /* ---------- MASONRY GRID ---------- */
-  .grid{
-    column-count:4; column-gap:10px;
-  }
-  @media (max-width:900px){ .grid{ column-count:3; } }
-  @media (max-width:600px){ .grid{ column-count:2; } }
+/* ---------- HERO (Overview) ---------- */
+.hero-banner{
+  position:relative;
+  width:100%;
+  height:380px;
+  /* Light gradient focused only at the bottom edge for text legibility */
+  background-image:linear-gradient(
+      to top,
+      rgba(0,0,0,0.75) 0%,
+      rgba(0,0,0,0.2) 40%,
+      rgba(0,0,0,0) 100%
+    ),
+    url('images/dash/hero.jpg');
+  background-size:cover;
+  background-position:center 30%;
+  border-radius:12px;
+  overflow:hidden;
+  margin-bottom:28px;
+  display:flex;
+  align-items:flex-end;
+  padding:32px;
+  box-sizing:border-box;
+  /* Brighten photograph details */
+  filter:brightness(1.12) contrast(1.05);
+}
+/* Ensure text remains sharp against the brightened image */
+.hero-caption-text{
+  color:#FFFFFF;
+  text-shadow:0 2px 6px rgba(0,0,0,0.85);
+  font-family:'Work Sans',sans-serif;font-size:13px;line-height:1.5;
+}
+.hero-caption-text b{color:var(--orange);}
+.hero-text{padding:34px 0 10px;}
+.eyebrow{font-family:'Work Sans',sans-serif;font-weight:600;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange-dp);}
+h1.headline{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(26px,4.2vw,42px);color:var(--navy);margin:8px 0 14px;line-height:1.15;}
+p.lede{font-size:17px;max-width:740px;color:var(--text);}
 
-  .grid-item{
-    break-inside:avoid; margin-bottom:10px; border-radius:6px; overflow:hidden;
-    cursor:pointer; position:relative; background:var(--linen-card);
-    box-shadow:0 1px 3px rgba(0,0,0,0.12);
-  }
-  .grid-item img{
-    width:100%; height:auto; display:block;
-    opacity:0; transition:opacity .4s ease;
-  }
-  .grid-item img.loaded{ opacity:1; }
-  .grid-item:hover{ box-shadow:0 4px 14px rgba(0,0,0,0.22); }
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:28px 0;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 15px;}
+.stat .num{font-family:'Fraunces',serif;font-weight:700;font-size:29px;color:var(--navy);}
+.stat .lbl{font-size:12.5px;font-weight:600;margin-top:2px;}
+.stat .note{font-size:10.5px;color:var(--muted);margin-top:3px;}
 
-  /* ---------- LIGHTBOX ---------- */
-  .lightbox{
-    position:fixed; inset:0; background:rgba(20,10,8,0.92);
-    z-index:2000; display:flex; align-items:center; justify-content:center;
-    opacity:0; pointer-events:none; transition:opacity .2s ease;
-  }
-  .lightbox.open{ opacity:1; pointer-events:auto; }
-  .lightbox img{
-    max-width:92vw; max-height:86vh; object-fit:contain;
-    border-radius:6px; box-shadow:0 30px 80px rgba(0,0,0,0.6);
-  }
-  .lightbox .lb-close{
-    position:absolute; top:18px; right:22px; width:38px; height:38px;
-    border-radius:50%; background:rgba(255,255,255,0.15); color:#fff;
-    border:none; font-size:18px; cursor:pointer;
-  }
-  .lightbox .lb-nav{
-    position:absolute; top:50%; transform:translateY(-50%);
-    width:46px; height:46px; border-radius:50%;
-    background:rgba(255,255,255,0.15); color:#fff; border:none;
-    font-size:20px; cursor:pointer;
-  }
-  .lightbox .lb-prev{ left:16px; }
-  .lightbox .lb-next{ right:16px; }
-  .lightbox .lb-counter{
-    position:absolute; bottom:18px; left:0; right:0; text-align:center;
-    font-family:'IBM Plex Mono',monospace; color:#fff; font-size:12px; opacity:.75;
-  }
+h2.sec{font-family:'Fraunces',serif;font-weight:700;font-size:22px;color:var(--navy);margin:34px 0 12px;}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+@media(max-width:720px){.cols{grid-template-columns:1fr;}}
 
-  footer{
-    text-align:center; padding:30px 20px 40px; color:var(--muted);
-    font-size:12px; font-family:'IBM Plex Mono',monospace;
-    border-top:1px solid var(--hairline); margin-top:20px;
-  }
+.strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:14px 0 30px;}
+/* Fixed 4:3 aspect box + object-fit:cover — portrait and landscape sources both
+   crop to the same clean thumbnail instead of stretching or overflowing. */
+.strip img{
+  width:100%;
+  aspect-ratio:4/3;
+  height:auto;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+  border-radius:8px;
+  box-shadow:0 1px 3px rgba(0,0,0,.12);
+  cursor:zoom-in;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.strip img:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.24);}
+.strip figure{margin:0;}
+.strip figcaption{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4;}
+/* five-image variant — fits 5 across on wide screens, wraps cleanly below */
+.strip.strip-5{grid-template-columns:repeat(auto-fill,minmax(185px,1fr));}
+/* Document variant — scans are mixed portrait/landscape, so fit the whole page
+   inside a taller tile rather than cropping it. Nothing is cut off. */
+.strip.strip-doc{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+.strip.strip-doc img{
+  aspect-ratio:3/4;
+  object-fit:contain;
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:6px;
+}
+
+/* ---------- other tabs (lighter pass, structure only) ---------- */
+.quote-card{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--orange);border-radius:var(--r);padding:20px 22px;margin:14px 0;}
+.quote-card .mr{font-family:'Noto Sans Devanagari','Fraunces',serif;font-size:16.5px;color:var(--navy);line-height:1.8;}
+.quote-card .en{font-size:13.5px;margin-top:10px;}
+.quote-card .who{font-size:11px;color:var(--muted);margin-top:10px;font-weight:600;}
+
+.acct{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0 30px;}
+.a-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.a-card .big{font-family:'Fraunces',serif;font-weight:700;font-size:26px;color:var(--navy);}
+.a-card .t{font-size:12.5px;font-weight:600;margin-top:4px;}
+.a-card .d{font-size:11.5px;color:var(--muted);margin-top:4px;}
+
+table.roster{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0 30px;}
+table.roster td{padding:8px 10px;border-bottom:1px solid var(--border);}
+table.roster td:first-child{font-weight:600;white-space:nowrap;}
+table.roster td:last-child{color:var(--muted);}
+
+.partners{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0 30px;}
+
+/* team member card grid */
+.team-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:18px;
+  margin:16px 0 30px;
+}
+.team-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px 14px;text-align:center;
+}
+.team-card img{
+  width:110px;height:110px;border-radius:50%;object-fit:cover;
+  display:block;margin:0 auto 12px;border:3px solid var(--navy-lt);
+}
+.team-card .t-name{font-family:'Fraunces',serif;font-weight:700;font-size:15px;color:var(--navy);}
+.team-card .t-role{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.p-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;}
+.p-card img{max-height:34px;margin:6px auto 0;display:block;}
+.p-card .role{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+
+.route-split{
+  display:flex;
+  height:600px;
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+  margin:14px 0;
+}
+.route-sidebar{
+  width:370px;
+  flex-shrink:0;
+  overflow-y:auto;
+  background:var(--card);
+  border-right:1px solid var(--border);
+  padding:18px 18px 24px;
+}
+.route-sidebar h4{font-family:'Fraunces',serif;font-weight:700;font-size:14.5px;color:var(--navy);margin:18px 0 8px;}
+.route-sidebar h4:first-child{margin-top:0;}
+.route-map-panel{flex:1;position:relative;}
+#routemap{width:100%;height:100%;}
+.rs-day{border-left:3px solid var(--day1);background:var(--bg);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px;}
+.rs-day.d2{border-color:var(--day2);}
+.rs-day.d3{border-color:var(--orange-dp);}
+.rs-day .rd-tag{font-family:'Work Sans',sans-serif;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.rs-day .rd-t{font-family:'Fraunces',serif;font-weight:700;font-size:13.5px;margin:2px 0 4px;}
+.rs-day .rd-d{font-size:11px;color:var(--muted);line-height:1.5;}
+.rs-legend{display:flex;flex-direction:column;gap:6px;font-size:11.5px;margin-bottom:4px;}
+.rs-legend .sw{display:inline-block;width:16px;border-top:3px solid;vertical-align:middle;margin-right:6px;}
+.rs-note{background:var(--navy-lt);border-radius:6px;padding:10px 12px;font-size:11px;color:var(--text);line-height:1.5;margin-top:6px;}
+@media(max-width:780px){
+  .route-split{flex-direction:column;height:auto;}
+  .route-sidebar{width:100%;max-height:340px;border-right:none;border-bottom:1px solid var(--border);}
+  .route-map-panel{height:420px;}
+}
+
+/* gender split bar */
+.gender-bar{display:flex;height:22px;border-radius:6px;overflow:hidden;margin:12px 0 10px;}
+.gb-f{background:var(--samarthya-red);}
+.gb-m{background:var(--navy-lt);}
+.gender-legend{display:flex;gap:18px;font-size:12px;flex-wrap:wrap;}
+.gender-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+.dot-f{background:var(--samarthya-red);}
+.dot-m{background:var(--navy-lt);border:1px solid var(--border);}
+.callout{background:var(--navy-lt);border-left:3px solid var(--navy);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--text);margin-top:14px;}
+
+/* day-wise bar chart */
+.bar-chart{display:flex;flex-direction:column;gap:12px;}
+.bc-row{display:flex;align-items:center;gap:12px;}
+.bc-lbl{width:78px;flex-shrink:0;font-size:11.5px;font-weight:600;line-height:1.3;}
+.bc-lbl span{font-weight:400;color:var(--muted);font-size:10.5px;}
+.bc-track{flex:1;background:var(--navy-lt);border-radius:6px;overflow:hidden;height:26px;}
+.bc-fill{height:100%;display:flex;align-items:center;justify-content:flex-end;color:#fff;font-family:'Fraunces',serif;font-weight:700;font-size:12.5px;padding-right:10px;border-radius:6px;min-width:34px;box-sizing:border-box;}
+
+/* occupation breakdown */
+.occ-grid{display:flex;flex-direction:column;gap:9px;margin:14px 0 26px;}
+.occ-row{display:grid;grid-template-columns:170px 1fr 90px;align-items:center;gap:10px;font-size:12.5px;}
+.occ-lbl{font-weight:600;}
+.occ-track{background:var(--navy-lt);border-radius:5px;height:14px;overflow:hidden;}
+.occ-fill{height:100%;background:var(--orange);border-radius:5px;}
+.occ-val{text-align:right;color:var(--muted);font-size:11.5px;white-space:nowrap;}
+@media(max-width:600px){ .occ-row{grid-template-columns:110px 1fr 70px;font-size:11px;} }
+
+.impact-box{
+  background:var(--navy);color:#fff;border-radius:var(--r);
+  padding:20px 22px;font-family:'Fraunces',serif;font-style:italic;
+  font-size:15px;line-height:1.6;margin:6px 0 30px;
+}
+
+.g-note{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;font-size:13.5px;color:var(--muted);margin:14px 0 30px;}
+
+/* dual-language beneficiary testimonial cards */
+.bene-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px 22px;margin:14px 0;
+}
+.bene-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--navy-lt);color:var(--navy);
+  font-family:'Work Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:.02em;
+  padding:5px 12px;border-radius:20px;margin-bottom:14px;
+}
+.bene-src-note{
+  font-family:'Work Sans',sans-serif;font-size:10px;font-style:italic;color:var(--muted);
+  margin-bottom:8px;
+}
+.bene-mr{
+  font-family:'Noto Sans Devanagari',sans-serif;font-size:16.5px;line-height:1.85;
+  color:var(--text);margin-bottom:10px;
+}
+.bene-en{
+  font-family:'Work Sans',sans-serif;font-size:13px;font-style:italic;color:var(--muted);
+  line-height:1.6;margin-bottom:12px;
+}
+.bene-attr{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+  border-top:1px solid var(--border);padding-top:10px;
+}
+.bene-attr .who{font-family:'Work Sans',sans-serif;font-size:12px;font-weight:600;color:var(--navy);}
+.bene-attr .who .mr-name{font-family:'Noto Sans Devanagari',sans-serif;font-weight:600;}
+.bene-kit-badge{
+  font-family:'Work Sans',sans-serif;font-size:10px;font-weight:700;
+  background:var(--orange);color:#fff;padding:4px 10px;border-radius:5px;white-space:nowrap;
+}
+
+footer{text-align:center;padding:26px 18px 36px;color:var(--muted);font-size:11.5px;border-top:1px solid var(--border);margin-top:10px;}
+
+/* ---------- LIGHTBOX ---------- */
+.lb{
+  position:fixed;inset:0;z-index:3000;
+  background:rgba(14,18,24,.92);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:3vh 3vw;
+  opacity:0;pointer-events:none;
+  transition:opacity .22s ease;
+}
+.lb.open{opacity:1;pointer-events:auto;}
+.lb-img{
+  max-width:85vw;
+  max-height:85vh;
+  width:auto;height:auto;
+  object-fit:contain;
+  border-radius:8px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  transform:scale(.97);
+  transition:transform .22s ease;
+}
+.lb.open .lb-img{transform:scale(1);}
+.lb-cap{
+  color:#EDF0F4;font-family:'Work Sans',sans-serif;font-size:13px;line-height:1.5;
+  text-align:center;max-width:min(85vw,760px);margin-top:14px;
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+.lb-close{
+  position:absolute;top:18px;right:22px;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.28);
+  color:#fff;font-size:22px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s ease;
+}
+.lb-close:hover{background:rgba(255,255,255,.28);}
+@media(max-width:600px){
+  .lb-close{top:10px;right:12px;width:38px;height:38px;font-size:19px;}
+  .lb-cap{font-size:12px;}
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="eyebrow">Samarthya Kalyankari Sanstha · Warkari Flood Emergency Response, July 2026</div>
-  <h1>Photo Gallery</h1>
-  <p>104 field photographs organized by the operation's own arc — the crisis, the accountability trail, and the people it was for. Donor-branded photos and beneficiary registration documents are kept out of this public gallery by design.</p>
-  <div class="stats" id="headerStats"></div>
-</header>
-
-<nav class="group-nav">
-  <a href="#group-emergency">Emergency, Logistics &amp; Route</a>
-  <a href="#group-verification">Verification &amp; Accountability</a>
-  <a href="#group-impact">Human Impact &amp; Credits</a>
-</nav>
-
-<main id="main"></main>
-
-<div class="lightbox" id="lightbox">
-  <button class="lb-close" id="lbClose">✕</button>
-  <button class="lb-nav lb-prev" id="lbPrev">‹</button>
-  <img id="lbImg" src="" alt="">
-  <button class="lb-nav lb-next" id="lbNext">›</button>
-  <div class="lb-counter" id="lbCounter"></div>
+<header class="site-header">
+<div class="masthead">
+    <div class="mh-left">
+      <span class="partner-label">IMPLEMENTATION PARTNER</span>
+      <img loading="lazy" src="images/dash/samarthya-logo.png" alt="Samarthya" class="logo-plain">
+      <div class="prog"><b>Madat Programme</b>Warkari Flood Emergency Response · Pune · July 2026</div>
+    </div>
+    <div class="mh-right">
+      <div class="mh-attr">
+        <span class="lbl">Donated by</span>
+        <img loading="lazy" src="images/dash/amazon-logo.png" alt="Amazon" class="logo-plain">
+      </div>
+      <div class="mh-attr">
+        <span class="lbl">Through</span>
+        <img loading="lazy" src="images/dash/donatekart-logo.png" alt="DonateKart Foundation" class="logo-plain">
+      </div>
+      <div class="mh-verified-pill">GPS-VERIFIED · JULY 2026</div>
+    </div>
 </div>
 
-<footer>
-  Samarthya Kalyankari Sanstha · Amazon, through DonateKart Foundation · Warkari Flood Emergency Response, July 2026
-</footer>
+<nav class="nav"><div class="nav-in" id="navin">
+  <button class="nb on" data-t="overview">Overview</button>
+  <button class="nb" data-t="route">The Model &amp; Route</button>
+  <button class="nb" data-t="voices">Voices of the Wari</button>
+  <button class="nb" data-t="accountability">Accountability</button>
+  <button class="nb" data-t="gallery">Field Gallery</button>
+  <button class="nb" data-t="team">Team &amp; Partners</button>
+</div></nav>
+</header>
+
+<!-- ===== OVERVIEW / HERO ===== -->
+<section class="tab on2" id="t-overview">
+  <div class="wrap" style="padding-top:22px;">
+    <div class="hero-banner">
+      <div class="hero-caption-text">Warkari Flood Emergency Response — Palkhi route, Pune–Satara corridor · <b>16–20 July 2026</b></div>
+    </div>
+
+    <div class="hero-text">
+      <div class="eyebrow">Madat Programme · Emergency flood relief 2026</div>
+      <h1 class="headline">300 families. 17 Dindis. Three days on the road.</h1>
+      <p class="lede">Samarthya's emergency response to the July 2026 floods along the Ashadhi Wari — GPS-tagged, photo-verified Shelter-cum-Hygiene Kits and Thermal Blankets, delivered by intercepting pilgrims at their own daily halts rather than waiting for them to reach a fixed camp.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="num">300</div><div class="lbl">Beneficiary Households Reached</div><div class="note">GPS &amp; Photo-verified relief kits</div></div>
+      <div class="stat"><div class="num">300</div><div class="lbl">Relief Kits Distributed</div><div class="note">Shelter Kit, Hygiene Kit &amp; Blanket</div></div>
+      <div class="stat"><div class="num">57.7%</div><div class="lbl">Female Beneficiaries</div><div class="note">173 of 300 households</div></div>
+      <div class="stat"><div class="num">17</div><div class="lbl">Dindis Served</div><div class="note">Across Palkhi routes</div></div>
+      <div class="stat"><div class="num">63.3%</div><div class="lbl">Primary Occupation</div><div class="note">190 beneficiaries engaged in Farming</div></div>
+      <div class="stat"><div class="num">3 Days</div><div class="lbl">Distribution Span</div><div class="note">16 July – 20 July 2026</div></div>
+    </div>
+
+    <h2 class="sec">Who was reached</h2>
+    <div class="cols">
+      <div class="a-card" style="padding:20px;">
+        <div style="font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--navy);margin-bottom:4px;">Gender of Head of Household / Primary Beneficiary</div>
+        <div class="gender-bar">
+          <div class="gb-f" style="width:57.7%;"></div><div class="gb-m" style="width:42.3%;"></div>
+        </div>
+        <div class="gender-legend">
+          <span><i class="dot-f"></i> Female — 173 (57.7%)</span>
+          <span><i class="dot-m"></i> Male — 127 (42.3%)</span>
+        </div>
+        <div class="callout">IASC Sphere Standard: minimum 50% female targeting in emergency distributions. Samarthya reached <b>57.7%</b>.</div>
+      </div>
+
+      <div class="a-card" style="padding:20px;">
+        <div style="font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--navy);margin-bottom:2px;">Daily Distribution Timeline</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:14px;">Relief kits delivered across distribution days</div>
+        <div class="bar-chart">
+          <div class="bc-row"><div class="bc-lbl">Day 1<br><span>16.07.2026</span></div><div class="bc-track"><div class="bc-fill" style="width:78.4%;background:var(--day1);">120</div></div></div>
+          <div class="bc-row"><div class="bc-lbl">Day 2<br><span>17.07.2026</span></div><div class="bc-track"><div class="bc-fill" style="width:100%;background:var(--day2);">153</div></div></div>
+          <div class="bc-row"><div class="bc-lbl">Day 3<br><span>20.07.2026</span></div><div class="bc-track"><div class="bc-fill" style="width:17.6%;background:var(--orange-dp);">27</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="sec">Occupational breakdown</h2>
+    <div class="occ-grid">
+      <div class="occ-row"><div class="occ-lbl">Farming</div><div class="occ-track"><div class="occ-fill" style="width:100%;"></div></div><div class="occ-val">190 · 63.3%</div></div>
+      <div class="occ-row"><div class="occ-lbl">Agri &amp; Daily Wage Labour</div><div class="occ-track"><div class="occ-fill" style="width:23.7%;"></div></div><div class="occ-val">45 · 15.0%</div></div>
+      <div class="occ-row"><div class="occ-lbl">Housework</div><div class="occ-track"><div class="occ-fill" style="width:15.8%;"></div></div><div class="occ-val">30 · 10.0%</div></div>
+      <div class="occ-row"><div class="occ-lbl">Sugarcane Cutting</div><div class="occ-track"><div class="occ-fill" style="width:10.5%;"></div></div><div class="occ-val">20 · 6.7%</div></div>
+      <div class="occ-row"><div class="occ-lbl">Fishing</div><div class="occ-track"><div class="occ-fill" style="width:2.6%;"></div></div><div class="occ-val">5 · 1.7%</div></div>
+      <div class="occ-row"><div class="occ-lbl">Small Business</div><div class="occ-track"><div class="occ-fill" style="width:2.6%;"></div></div><div class="occ-val">5 · 1.7%</div></div>
+      <div class="occ-row"><div class="occ-lbl">Education</div><div class="occ-track"><div class="occ-fill" style="width:1.6%;"></div></div><div class="occ-val">3 · 1.0%</div></div>
+      <div class="occ-row"><div class="occ-lbl">Other</div><div class="occ-track"><div class="occ-fill" style="width:1.1%;"></div></div><div class="occ-val">2 · 0.6%</div></div>
+    </div>
+
+    <div class="impact-box">Samarthya distributed 300 relief kits comprising Shelter Kits, Hygiene Kits, and Blankets to flood-affected Warkari beneficiaries across multiple locations in Maharashtra. The relief assistance helped vulnerable flood-affected households meet immediate shelter, hygiene, and basic protection needs during the emergency response.</div>
+
+    <h2 class="sec">When the rains came</h2>
+    <div class="cols">
+      <p>In under six days, <b>264.8mm of rain</b> fell over Pune district and the Indrayani river flooded. Alandi — where the Sant Dnyaneshwar Maharaj Palkhi begins its 21-day walk to Pandharpur — was cut off, every approach road blocked or submerged, just as lakhs of Warkaris gathered for the 8 July Prasthan.</p>
+      <p>Most Warkaris are farmers and daily-wage workers carrying only what they need for three weeks on foot. Local administration moved people into 100+ municipal schools, but mats and bedding ran short fast. It was into this that Samarthya's kits, funded by Amazon through DonateKart Foundation, were sent.</p>
+    </div>
+    <div class="strip strip-5">
+      <figure><img loading="lazy" src="images/dash/rains-1.jpg" alt=""><figcaption>An elderly Warkari asleep on bare, rain-soaked ground — the conditions the kits were built for</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/rains-2.jpg" alt=""><figcaption>Families crowded under a borrowed canvas tent, sitting directly on wet earth, clothes hung out to dry</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/rains-3.jpg" alt=""><figcaption>Warkaris resting on the bare dirt floor of a farm shed — no mats, no bedding, shelter borrowed wherever it could be found</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/rains-4.jpg" alt=""><figcaption>Waterlogged halt conditions along the Palkhi corridor, July 2026</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/rains-5.jpg" alt=""><figcaption>Muddy ground along the walking route after the Indrayani flooding</figcaption></figure>
+    </div>
+
+    <h2 class="sec">What a kit became</h2>
+    <p style="font-size:13px;color:var(--muted);max-width:740px;margin-top:-6px;">A Shelter-cum-Hygiene Kit was never just a box to be opened once. Within hours of handover the same tarpaulin was doing several jobs at once — a dry floor over wet ground, a second roof lashed to a tree or a window ledge, a rain screen for a parked truck, an instant seating mat for a whole Dindi, and, after dark, the blanket that made sleep on the ground possible.</p>
+    <div class="strip strip-5">
+      <figure><img loading="lazy" src="images/dash/kit-became-1.jpg" alt=""><figcaption>The yellow tarpaulin spread as flooring inside the tent, an Amazon Emergency Supplies carton doubling as a seat at the edge</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/kit-became-2.jpg" alt=""><figcaption>A Dindi settled in for the night on the same tarpaulin, dry ground under them where there had only been mud</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/kit-became-3.jpg" alt=""><figcaption>A blue ground sheet laid corner to corner inside a green-tarp tent, five families sharing one dry floor</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/kit-became-4.jpg" alt=""><figcaption>The same sheet doing service as a sitting mat while the group waits out the rain together</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/kit-became-5.jpg" alt=""><figcaption>An Emergency Supplies carton kept dry at the centre of the tarpaulin, the group gathered around it rather than around bare ground</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/kit-became-6.jpg" alt=""><figcaption>A blanket worn as a shawl against the evening damp, the tent's own tarpaulin roof patched together behind her</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/kit-became-7.jpg" alt=""><figcaption>A tarpaulin stretched as instant seating under shade netting, one Warkari already asleep at its edge</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/kit-became-8.jpg" alt=""><figcaption>A parked container truck pressed into service as rain cover, women and their kits sheltered on a yellow tarpaulin at its wheels</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/kit-became-9.jpg" alt=""><figcaption>A tarpaulin rigged as a second roof over a courtyard, tied off to a window ledge and a tree to keep an entire group dry</figcaption></figure>
+      <figure><img loading="lazy" src="images/dash/kit-became-10.jpg" alt=""><figcaption>Hygiene kit items still in hand as the group sits together on the tarpaulin floor of their tent</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ROUTE (structure pass) ===== -->
+<section class="tab" id="t-route"><div class="wrap" style="padding-top:30px;">
+  <div class="eyebrow">A route-intercept distribution model</div>
+  <h1 class="headline" style="font-size:28px;">Meeting a moving pilgrimage</h1>
+  <p class="lede">Warkaris travel in Dindis — self-contained groups of 50–500 led by a Dindi Pramukh. Samarthya reached each one at its own daily halt rather than waiting at a fixed camp.</p>
+  <h2 class="sec">The route — GPS-tagged, halt by halt</h2>
+
+  <div class="route-split">
+    <div class="route-sidebar">
+      <h4>Day-wise summary</h4>
+      <div class="rs-day">
+        <div class="rd-tag">Day 1 · 16 July</div>
+        <div class="rd-t">NH 65, Pune → Solapur</div>
+        <div class="rd-d">120 families · 7 Dindis · 220km round trip · ₹4,500</div>
+      </div>
+      <div class="rs-day d2">
+        <div class="rd-tag">Day 2 · 17 July</div>
+        <div class="rd-t">Shirur → Phaltan</div>
+        <div class="rd-d">153 families · 9 Dindis · 280km · ₹5,500 · Taradgaon detour around a highway closure</div>
+      </div>
+      <div class="rs-day d3">
+        <div class="rd-tag">Day 3 · 20 July</div>
+        <div class="rd-t">Samatanagar</div>
+        <div class="rd-d">27 families · 1 Dindi · Samarthya's own vehicle, no hire cost</div>
+      </div>
+
+      <h4>Legend</h4>
+      <div class="rs-legend">
+        <span><i class="sw" style="border-color:var(--day1)"></i>Day 1 route — amber</span>
+        <span><i class="sw" style="border-color:var(--day2)"></i>Day 2 route — crimson</span>
+        <span>Marker size ∝ photos geotagged at that halt</span>
+        <span>Click any marker for the field photograph taken there</span>
+      </div>
+
+      <h4>Route notes</h4>
+      <div class="rs-note">The Day 2 return leg (Phaltan → Supe) bows through Baramati — a real waypoint named directly in that halt's own GPS record, not an invented shortcut. Day 3 (Samatanagar) has no GPS-tagged photos yet, so it isn't plotted here.</div>
+    </div>
+    <div class="route-map-panel">
+      <div id="routemap"></div>
+    </div>
+  </div>
+
+  <h2 class="sec">The Wari runs on paper</h2>
+  <p style="font-size:13px;color:var(--muted);max-width:760px;margin-top:-6px;">Long before Samarthya's truck set out each morning, every Dindi already knew exactly where it would be that day — worked out, printed and carried as a schedule listing each halt, each night's stop and each day's <em>annadata</em>. Reaching a Dindi at the right place depended entirely on reading and trusting this existing system rather than replacing it. These are ten of those schedules, collected in the field.</p>
+  <div class="rs-note" style="max-width:760px;margin-bottom:16px;">Eight of the ten name a Dindi or Pramukh that also appears in Samarthya's own distribution records — independent, third-party corroboration of both the Pramukh roster and the route. Scan 1 in particular lists <b>16 July at Taradgaon and 17 July at Phaltan</b>, matching the Day 2 route exactly.</div>
+  <div class="strip strip-doc">
+    <figure><img loading="lazy" src="images/dash/dindi-schedule-01.jpg" alt=""><figcaption><b>Gopal Maharaj Hosurkar's Dindi</b> — Sant Dnyaneshwar Palkhi, 33rd year. Its own table puts the Dindi at Taradgaon on 16 July and Phaltan on 17 July, matching Day 2 of the operation. Pramukh Gopal Hosurkar is quoted in Voices of the Wari.</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/dindi-schedule-02.jpg" alt=""><figcaption><b>Shri Dharmanath Maharaj Payi Dindi</b> — Jawala–Sangvi Surya, Tal. Parner, 14th year. Names Eknath Maharaj Pathare, also quoted in Voices of the Wari.</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/dindi-schedule-03.jpg" alt=""><figcaption><b>Swayambhu Mahadev Mandir Dindi, Papari</b> — Alandi to Pandharpur, 6–26 July. Carries Kuber Dongare's own contact number; he too is quoted in Voices of the Wari.</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/dindi-schedule-04.jpg" alt=""><figcaption><b>Sant Sawatamali Shripadbaba Ramdasbaba Dindi</b> — Belwandi Bu. to Pandharpur, 32nd year. Belwandi is the venue written on the registration sheets in the Accountability tab.</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/dindi-schedule-05.jpg" alt=""><figcaption><b>Kalbhairavnath Jogeshwari Mata Dindi</b> — Tardobachi Wadi to Pandharpur, and only its first year. Its halt list includes Siddhatek, on the Day 1 corridor.</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/dindi-schedule-06.jpg" alt=""><figcaption><b>Nimgaon Mhalungi &amp; Panchkroshi</b>, Tal. Shirur — a full Palkhi timetable giving every meal, preacher and kirtankar for each day of the walk.</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/dindi-schedule-07.jpg" alt=""><figcaption><b>Thorandale to Pandharpur</b> — 30th year, established 1997, organised by Balasaheb Maharaj Minde of Thorandale, Tal. Ambegaon.</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/dindi-schedule-08.jpg" alt=""><figcaption><b>Govind Baba Dindi</b>, Shri Bhairavnath Warkari Seva Mandal — Loni Mavala to Pandharpur, listing every halt from Pimpri Jalsen to Pandharpur.</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/dindi-schedule-09.jpg" alt=""><figcaption><b>Sudhakar Maharaj Dhondge's Dindi</b>, Kambarkhed — travelling from Mehkar via Shani Shingnapur to join the Palkhi at Alandi, a reminder of how far some Dindis come before the Wari even begins.</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/dindi-schedule-10.jpg" alt=""><figcaption><b>Nathrao Maharaj Rathod's Dindi</b> — the sheet carries a photograph of roughly eighty individual members, each one named: the Wari's own register of who walks.</figcaption></figure>
+  </div>
+
+  <h2 class="sec">The Wari on the move</h2>
+  <p style="font-size:13px;color:var(--muted);max-width:760px;margin-top:-6px;">Between the halts there is only the road. These fifteen frames were made along the same corridors the map above plots — Shirur at midday, the Daund–Patas stretch through the afternoon, the Supe crossing at dusk, and the Satara side of the route the following morning. They are what the printed schedules look like when they are actually being walked: a tractor towing a shrine, a numbered placard, a file of white caps thinning out to a knot on an empty carriageway.</p>
+  <div class="rs-note" style="max-width:760px;margin-bottom:16px;">Fourteen of these fifteen frames carry GPS coordinates and sit in the same cluster table that draws the map above, which is why each caption can name a time and a place. Two of them also carry their own fixed proof: the arch on the Shirwal–Lonand stretch is an official Government of Maharashtra structure inscribed <b>आषाढी वारी २०२६</b> and credited to the District Administration, Satara; and the PWD gantry on the Phaltan approach reads <b>Phaltan 12</b>, matching to within a kilometre the GPS distance from that stretch to the Phaltan halt where the Day 2 kits were handed over.</div>
+  <div class="strip strip-5">
+    <figure><img loading="lazy" src="images/dash/wari-move-1.jpg" alt=""><figcaption><b>16 July, 11:31 · Shirur</b> — the head of a Dindi on the concrete road, flag-bearer first, the Palkhi vehicle and the rest of the file strung out behind him</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-2.jpg" alt=""><figcaption><b>16 July, 11:53 · Shirur</b> — the same stretch twenty minutes on: a Dindi reduced to a knot of white between cane fields, its loudspeaker vehicle the only thing readable at distance</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-3.jpg" alt=""><figcaption><b>16 July, 16:07 · Daund–Patas corridor</b> — a Dindi's own Palkhi trailer, mirror-work domes and marigold strings, towed by tractor while its flag-bearers walk on ahead</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-4.jpg" alt=""><figcaption><b>16 July, 16:07 · Daund–Patas corridor</b> — five flags and a handful of walkers under a sky already going dark: the smaller Dindis travel like this the whole way</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-5.jpg" alt=""><figcaption><b>16 July, 16:48 · Daund–Patas corridor</b> — the shrine trailer of Shri Nagnath &amp; Garudnath Maharaj Payi Dindi, its board naming Shirur taluka in Pune district, with an elder at the wheel of the tractor towing it</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-6.jpg" alt=""><figcaption><b>16 July, 16:48 · Daund–Patas corridor</b> — the same driver from behind, watching his Dindi's flags move off up the road before he follows</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-7.jpg" alt=""><figcaption><b>16 July, 17:56 · Shirsuphal–Supe</b> — Shri Sant Yogiraj Changavateshwar Maharaj Palkhi Sohala, its banner naming Saswad in Purandar taluka: drums, a garlanded horse, and a column running back to the horizon</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-8.jpg" alt=""><figcaption><b>16 July, 17:57 · Shirsuphal–Supe</b> — walking into the low sun behind the numbered placard of <b>दिंडी ७</b>, cloth bags over the shoulder, the flags of the Dindis behind already visible</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-9.jpg" alt=""><figcaption><b>16 July, 17:58 · Shirsuphal–Supe</b> — a tulsi vrindavan carried on the head through the middle of the crowd, flags above it, the storm cloud sitting directly overhead</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-10.jpg" alt=""><figcaption><b>16 July, 17:58 · Shirsuphal–Supe</b> — the file coming past in the last of the light: white caps, saffron sashes, brass tal in hand, a bag on every shoulder</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-11.jpg" alt=""><figcaption><b>16 July, 17:59 · Shirsuphal–Supe</b> — villagers waiting on the shoulder as the Dindi files past an oncoming cement tanker: the Wari and ordinary highway traffic on the same carriageway</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-12.jpg" alt=""><figcaption><b>16 July, 18:19 · Supe</b> — walking the dirt shoulder of a newly built highway, the Palkhi vehicle up ahead where the made surface runs out</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-13.jpg" alt=""><figcaption><b>16 July, 18:21 · Supe</b> — two minutes later, seen wide: the entire Dindi is the small bright knot at the centre, traffic passing it at speed on both sides</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-14.jpg" alt=""><figcaption><b>17 July, 11:08 · Shirwal–Lonand</b> — the official Ashadhi Wari 2026 arch, welcoming all Warkaris on behalf of the Rural Development &amp; Panchayat Raj Department, Government of Maharashtra, and the District Administration, Satara</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/wari-move-15.jpg" alt=""><figcaption><b>17 July · the Phaltan approach</b> — the PWD gantry that fixes the operation on the public map: Phaltan 12, Baramati 41, Pandharpur 115 — the destination still a hundred kilometres off</figcaption></figure>
+  </div>
+</div></section>
+
+<!-- ===== VOICES (structure pass, 2 sample quotes) ===== -->
+<section class="tab" id="t-voices"><div class="wrap" style="padding-top:30px;">
+  <div class="eyebrow">What the Pramukhs said</div>
+  <h1 class="headline" style="font-size:28px;">Voices of the Wari</h1>
+  <div class="quote-card">
+    <div class="mr">"आम्हाला हे ठाऊक नव्हते की अ‍ॅमेझॉनसारखी कंपनी वारकऱ्यांसाठी असे मानवतेचे कार्य करत आहे."</div>
+    <div class="en">"We did not know a company like Amazon stood behind this kind of humanitarian work for the Warkari."</div>
+    <div class="who">Gopal Hosurkar · Dindi Pramukh · Hosur, Phaltan</div>
+  </div>
+  <div class="quote-card">
+    <div class="mr">"सामर्थ्य आणि अ‍ॅमेझॉनची माणसे आपल्या कामातच पांडुरंग पाहतात."</div>
+    <div class="en">"You from Samarthya and Amazon see Pandurang in the work you do."</div>
+    <div class="who">Kuber Dongare · Dindi Pramukh · Papari</div>
+  </div>
+  <div class="g-note">Full set of 5 Pramukh quotes (Marathi + English) slots in here once WhatsApp-confirmed with each Pramukh.</div>
+
+  <h2 class="sec" style="margin-top:38px;">Beneficiary voices</h2>
+  <p style="font-size:13px;color:var(--muted);max-width:700px;margin-top:-6px;">Feedback collected directly from Warkari families at the point of distribution. Two of the six below have verified original Marathi transcripts; the other four were recorded in English in the field and are shown with a rendered Marathi translation, clearly marked as such.</p>
+
+  <div class="bene-card">
+    <div class="bene-tag">⛺ Immediate Shelter / तात्पुरता निवारा</div>
+    <div class="bene-mr">"आम्ही वारीचा प्रवास सुरू केला तवा अनेक दानशूर लोक पाणी आणि जेवण वाटत होते. खाण्यापिण्याची अडचण नव्हती, पण पावसापासून बचावासाठी निवाऱ्याच्या साहित्याची लयी गरज व्हती. तुम्ही नेमकी तीच सोय केली."</div>
+    <div class="bene-en">"When we started the journey, many donors were offering food and water. Food was not an issue, but shelter materials to protect against heavy rain were urgently needed. You provided exactly that."</div>
+    <div class="bene-attr">
+      <div class="who"><span class="mr-name">शारदाबाई दराडे, पळसखेड</span> · Shardabai Darade, Palaskhed</div>
+      <div class="bene-kit-badge">Shelter Kit Beneficiary</div>
+    </div>
+  </div>
+
+  <div class="bene-card">
+    <div class="bene-tag">🩸 Women's Hygiene &amp; Dignity / महिला स्वच्छता व सन्मान</div>
+    <div class="bene-mr">"पाऊस आणि पुराच्या कठीण येळेला मला जुनं फाटकं कापडच वापरावं लागत होतं. तुम्ही मला सॅनिटरी पॅड्स देऊन खुप मोठा दिलासा दिला."</div>
+    <div class="bene-en">"During the severe rain and flooding, I was forced to use old torn cloth. Providing sanitary pads was a huge relief for me."</div>
+    <div class="bene-attr">
+      <div class="who"><span class="mr-name">गोदावरी चाटे, सातारा</span> · Godavari Chate, Satara</div>
+      <div class="bene-kit-badge">Hygiene &amp; Dignity Kit</div>
+    </div>
+  </div>
+
+  <div class="bene-card">
+    <div class="bene-tag">🦟 Health &amp; Protection / आरोग्य व सुरक्षा</div>
+    <div class="bene-src-note">Recorded in English in the field · Marathi below is a rendered translation, not a verbatim transcript</div>
+    <div class="bene-mr">"पावसाळ्यात उघड्यावर किंवा तंबूत झोपताना डास आणि किड्यांचा खूप त्रास व्हायचा, आणि आम्हाला डेंग्यू किंवा मलेरिया होण्याची भीती वाटायची. पण तुम्ही दिलेल्या मच्छरदाणीमुळे रात्री आम्ही डासांपासून पूर्णपणे सुरक्षित राहिलो."</div>
+    <div class="bene-en">"Sleeping in the open or in a tent during the monsoon brings a lot of trouble from mosquitoes and insects, and we were afraid of getting dengue or malaria. But the mosquito net you gave us kept us completely safe from mosquitoes at night."</div>
+    <div class="bene-attr">
+      <div class="who"><span class="mr-name">अनिता घुगे, पळसखेड</span> · Anita Ghuge, Palaskhed</div>
+      <div class="bene-kit-badge">Mosquito Net / Health Kit</div>
+    </div>
+  </div>
+
+  <div class="bene-card">
+    <div class="bene-tag">🎒 Belongings &amp; Carry Kit / सामान वाहून नेण्याची सोय</div>
+    <div class="bene-src-note">Recorded in English in the field · Marathi below is a rendered translation, not a verbatim transcript</div>
+    <div class="bene-mr">"वारीदरम्यान आपलं सगळं सामान एकत्र आणि पावसापासून सुरक्षित ठेवणं ही मोठी अडचण होती. या मोठ्या, मजबूत कॅरियर बॅगमुळे आमचं वैयक्तिक सामान एका जागी सुरक्षित राहिलं आणि चालताना ते वाहून नेणंही खूप सोपं झालं."</div>
+    <div class="bene-en">"Keeping all our belongings together and safe from the rain during the Wari was a big challenge. This large, sturdy carrier bag let us keep all our personal belongings safe in one place, and made it much easier to carry while walking."</div>
+    <div class="bene-attr">
+      <div class="who"><span class="mr-name">फुलाबाई जाधव, तरडोबाचीवाडी</span> · Fulabai Jadhav, Tardobachiwadi</div>
+      <div class="bene-kit-badge">Carrier Bag / Utility Kit</div>
+    </div>
+  </div>
+
+  <div class="bene-card">
+    <div class="bene-tag">🛌 Warmth &amp; Rest / ऊब आणि विश्रांती</div>
+    <div class="bene-src-note">Recorded in English in the field · Marathi below is a rendered translation, not a verbatim transcript</div>
+    <div class="bene-mr">"पावसामुळे जमीन सगळीकडे चिखलमय आणि ओलसर झाली होती. रात्री अंथरायला प्लास्टिक शीट आणि पांघरायला ऊबदार ब्लँकेट मिळाल्यामुळे थंड, ओलसर जमिनीचा त्रास झाला नाही. शांत झोपेमुळे दुसऱ्या दिवशी चालण्याचं बळ मिळालं."</div>
+    <div class="bene-en">"The rain had turned the ground muddy and damp everywhere. Having a plastic ground sheet to spread out at night and a warm blanket to cover ourselves meant we weren't troubled by the cold, damp ground. A peaceful night's sleep gave us the strength to keep walking the next day."</div>
+    <div class="bene-attr">
+      <div class="who"><span class="mr-name">मधुरी दोईफोडे, चिंचोली</span> · Madhuri Doifode, Chincholi</div>
+      <div class="bene-kit-badge">Ground Sheet &amp; Blanket</div>
+    </div>
+  </div>
+
+  <div class="bene-card">
+    <div class="bene-tag">⛺ Emergency Shelter / तात्काळ निवारा</div>
+    <div class="bene-src-note">Recorded in English in the field · Marathi below is a rendered translation, not a verbatim transcript</div>
+    <div class="bene-mr">"वारीच्या वाटेवर अचानक जोरदार पाऊस सुरू झाला की निवारा शोधणं कठीण व्हायचं. पण तुम्ही दिलेल्या ताडपत्री आणि मजबूत दोरीमुळे आम्ही झटपट तात्पुरता निवारा उभारू शकलो. त्यामुळे आमचे कपडे, सामान आणि धान्य पावसात भिजण्यापासून वाचलं."</div>
+    <div class="bene-en">"When sudden heavy rain would start along the Wari route, it was hard to find any shelter. But with the tarpaulin and strong rope you gave us, we could quickly put up a temporary shelter. That saved our clothes, belongings, and grain from getting soaked in the rain."</div>
+    <div class="bene-attr">
+      <div class="who"><span class="mr-name">रेखा पोपट पवार, जातेगाव</span> · Rekha Popat Pawar, Jategaon</div>
+      <div class="bene-kit-badge">Tarpaulin &amp; Rope Kit</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ===== ACCOUNTABILITY (structure pass) ===== -->
+<section class="tab" id="t-accountability"><div class="wrap" style="padding-top:30px;">
+  <div class="eyebrow">Evidence &amp; verification</div>
+  <h1 class="headline" style="font-size:28px;">Verified accountability for every kit</h1>
+  <div class="acct">
+    <div class="a-card"><div class="big">234</div><div class="t">Tokens issued directly</div><div class="d">Serialized paper tokens matched to families</div></div>
+    <div class="a-card"><div class="big">66</div><div class="t">Kits via Dindi Pramukh</div><div class="d">Rain made 1:1 matching impractical — signed for by the Pramukh</div></div>
+    <div class="a-card"><div class="big">300</div><div class="t">Total — reconciled exactly</div><div class="d">234 + 66 = 300, no gap</div></div>
+  </div>
+
+  <h2 class="sec">The register, filled in at the halt</h2>
+  <p style="font-size:13px;color:var(--muted);max-width:720px;margin-top:-6px;">Every kit was entered against a name, village, occupation, family size and kit number on the Warkari Flood Emergency Response distribution record — signed or thumb-marked by the beneficiary at the moment of handover.</p>
+  <div class="strip strip-5">
+    <figure><img loading="lazy" src="images/dash/register-1.jpg" alt=""><figcaption>A beneficiary signs the distribution record at Belwandi — name, village, occupation, family size and kit number entered against every kit</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/register-2.jpg" alt=""><figcaption>Samarthya's enumerator completing the register at the halt, with Dindi members standing by as the entries are made</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/register-3.jpg" alt=""><figcaption>Thumb impressions taken with a stamp pad for beneficiaries who don't sign — same register, same verification, nobody left off the record</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/register-4.jpg" alt=""><figcaption>An elderly Warkari gives her details to be recorded — registration done seated on the ground, at the halt, at her own pace</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/register-5.jpg" alt=""><figcaption>A signature entered beside the pilgrim's own ektara — the register travelled with the Wari, filled in wherever the Dindi stopped</figcaption></figure>
+  </div>
+
+  <h2 class="sec">Serialized token distribution on the move</h2>
+  <p style="font-size:13px;color:var(--muted);max-width:740px;margin-top:-6px;">Before any kit changed hands, each family was issued a serialized paper token carrying its own number, the beneficiary's name and village, and a tick-box for the exact entitlement — one Shelter-cum-Hygiene Kit and one Thermal Blanket. Every token was stamped <b>VERIFIED</b> at issue and marked <b>ISSUED</b> at collection, then matched back against the register, so no family could be counted twice and none could be missed. 234 of the 300 kits were released against a token held directly by the family; the remaining 66 went through the Dindi Pramukh, where rain made one-by-one matching impractical in the queue.</p>
+  <div class="strip strip-5">
+    <figure><img loading="lazy" src="images/dash/token-1.jpg" alt=""><figcaption>Token 033 held up at the halt — stamped VERIFIED, with both entitlements ticked off at handover: one Shelter-cum-Hygiene Kit, one Thermal Blanket</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/token-2.jpg" alt=""><figcaption>Token 016 — each slip carried its own terms printed at the foot: valid for one family, non-transferable, to be presented at the distribution counter</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/token-3.jpg" alt=""><figcaption>Token 030, carrying the Amazon, DonateKart Foundation and Samarthya marks alongside the beneficiary's own name and the VERIFIED stamp</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/token-4.jpg" alt=""><figcaption>Token 028 in hand as the distribution vehicles stand by — tokens were issued ahead of collection so families knew their place in the queue</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/token-5.jpg" alt=""><figcaption>Token 036 presented in front of the stacked kit boxes — every token was checked against the register before a single box was released</figcaption></figure>
+  </div>
+</div></section>
+
+<!-- ===== GALLERY (structure pass) ===== -->
+<section class="tab" id="t-gallery"><div class="wrap" style="padding-top:30px;">
+  <div class="eyebrow">Field photographs · July 2026</div>
+  <h1 class="headline" style="font-size:28px;">Field gallery</h1>
+
+  <h2 class="sec">Kits in motion: volunteers and Warkaris carrying the load</h2>
+  <p style="font-size:13px;color:var(--muted);max-width:740px;margin-top:-6px;">Every one of the 300 kits was moved by hand. With no loading bay or trolley at a roadside halt, Samarthya's team and the Warkaris themselves formed the chain together — off the truck bed, down the line, and then on foot into the tented camps or straight up onto the Dindis' own garlanded vehicles.</p>
+  <div class="strip strip-5">
+    <figure><img loading="lazy" src="images/dash/kits-motion-1.jpg" alt=""><figcaption>Hand to hand off the tailgate — the unloading chain that moved every kit from the container truck to the distribution point</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/kits-motion-2.jpg" alt=""><figcaption>A Warkari reaches up to take a kit down onto the marigold-and-bells Palkhi vehicle — kits loaded directly onto the Dindi's own transport</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/kits-motion-3.jpg" alt=""><figcaption>Warkaris and volunteers working the truck bed together, the Dindi's water drums lashed alongside — relief kits and the group's own supplies travelling as one load</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/kits-motion-4.jpg" alt=""><figcaption>The last stretch on foot — one kit by the handle, one on the shoulder, carried from the truck into the tented halt as others follow behind</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/kits-motion-5.jpg" alt=""><figcaption>Two kits to a person, walked in from the roadside past the flower-decked Palkhi vehicle</figcaption></figure>
+  </div>
+
+  <h2 class="sec">Community briefings and kit demonstration</h2>
+  <p style="font-size:13px;color:var(--muted);max-width:740px;margin-top:-6px;">At every halt the team addressed the Dindi before distribution began — explaining the process, opening a kit and holding up each item so families knew exactly what they were receiving, and naming Amazon and DonateKart Foundation as the source of the support. The donor banner was displayed at each of these gatherings, and most closed with the Dindi Pramukh's own coconut felicitation.</p>
+  <div class="strip strip-5">
+    <figure><img loading="lazy" src="images/dash/briefing-1.jpg" alt=""><figcaption>The programme opens with an address to the assembled Dindi — donor banner tied to the container truck, kits stacked and counted behind</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/briefing-2.jpg" alt=""><figcaption>Kit contents shown item by item — blankets, bucket, tarpaulin and hygiene packets laid out on the boxes so every family saw exactly what they would receive</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/briefing-3.jpg" alt=""><figcaption>Samarthya's coordinator walking Dindi members through the distribution process before the queue formed</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/briefing-4.jpg" alt=""><figcaption>Hundreds seated in the open at a single halt, hands folded, as the relief operation and Amazon's support were explained</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/briefing-5.jpg" alt=""><figcaption>Warkari women hold the donor banner behind the stacked kits at the close of a distribution</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/briefing-6.jpg" alt=""><figcaption>Kits stacked at the halt with the waiting Dindi behind — every box carrying the Amazon Disaster Relief Donation mark</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/briefing-7.jpg" alt=""><figcaption>A roadside briefing with Dindi Pramukhs and senior Warkaris, the banner strung up between the trees behind</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/briefing-8.jpg" alt=""><figcaption>Shri Dharmanath Maharaj Payi Dindi of Jawala, Tal. Parner — the group holds the donor banner, blankets raised behind them</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/briefing-9.jpg" alt=""><figcaption>A coconut and thali offered in felicitation as a kit is formally handed to the Dindi's leadership</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/briefing-10.jpg" alt=""><figcaption>A roadside gathering beside the Dindi's decorated Palkhi vehicle — Samarthya's team briefing Pramukhs and Warkaris together before distribution</figcaption></figure>
+  </div>
+
+  <h2 class="sec">Kits in hand: the families who received them</h2>
+  <p style="font-size:13px;color:var(--muted);max-width:740px;margin-top:-6px;">Three hundred families walked on with a dry shelter sheet, a hygiene kit and a warm blanket they did not have that morning. These are some of them at the moment of receiving — at the distribution counter, and back at the tarpaulin shelters where the kits were opened and put straight to use.</p>
+  <div class="strip strip-5">
+    <figure><img loading="lazy" src="images/dash/beneficiary-1.jpg" alt=""><figcaption>A young woman and two elders beside her, hands resting on a kit just signed for — spare blankets stacked behind for the families still in the queue</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/beneficiary-2.jpg" alt=""><figcaption>Outside her tarpaulin shelter, a blanket from the kit already folded and ready for the night</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/beneficiary-3.jpg" alt=""><figcaption>A turquoise blanket unpacked at the tent door, her child sheltering just behind her</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/beneficiary-4.jpg" alt=""><figcaption>Kit received at her own shelter — water can, firewood and now a dry blanket, all in one place</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/beneficiary-5.jpg" alt=""><figcaption>Dusk at the halt: the kit set down at the tent opening, the blanket that would take the chill out of the night resting on top</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/beneficiary-6.jpg" alt=""><figcaption>Coconuts in hand for the felicitation as a kit is formally received by the Dindi's leadership</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/beneficiary-7.jpg" alt=""><figcaption>Carrying her family's kit away from the counter, the day's thali balanced on top of the box</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/beneficiary-8.jpg" alt=""><figcaption>Five women of one Dindi with the kit held between them, saffron flags behind</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/beneficiary-9.jpg" alt=""><figcaption>Seated together around a kit received on the group's behalf, on the road where the Dindi had halted</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/beneficiary-10.jpg" alt=""><figcaption>Kit collected without once letting go of the Dindi's flag</figcaption></figure>
+  </div>
+
+  <h2 class="sec">Human smiles</h2>
+  <p style="font-size:13px;color:var(--muted);max-width:740px;margin-top:-6px;">Between the counting, the queueing and the paperwork, this is what the three days actually felt like — the Wari's own warmth, on faces rather than in numbers. Musicians tuning a tanpura in the shade, water shared hand to hand at a roadside halt, an elder helped up onto a trailer, a woman laughing outright at something just out of frame.</p>
+  <div class="strip strip-5">
+    <figure><img loading="lazy" src="images/dash/smiles-1.jpg" alt=""><figcaption>A cool drink under the neem shade, tanpura balanced against his shoulder — a moment's rest before the next kirtan</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-2.jpg" alt=""><figcaption>Water poured hand to hand at the roadside — the same steel kettle and cooler that keep a whole Dindi going between halts</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-3.jpg" alt=""><figcaption>Talwaar cymbals raised and ready, a warm laugh breaking through before the bhajan starts</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-4.jpg" alt=""><figcaption>Feet bare, flag close at hand, an easy smile from a stop along the road</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-5.jpg" alt=""><figcaption>A short rest in the shade of the flags, the group settling in together before moving on</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-6.jpg" alt=""><figcaption>Women of the Dindi pausing under the trees, one flag still catching the wind above them</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-7.jpg" alt=""><figcaption>A tanpura dressed in marigold and jasmine, its owner glancing back mid-smile</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-8.jpg" alt=""><figcaption>Caught mid-laugh — the kind of unguarded warmth that ran through every halt on the route</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-9.jpg" alt=""><figcaption>A veena player watching the road ahead, waiting his turn to walk on</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-10.jpg" alt=""><figcaption>An elder steadied by a hand as she's helped up, one Warkari to another</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-11.jpg" alt=""><figcaption>Hands clasped in greeting, a smile breaking out on both sides</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-12.jpg" alt=""><figcaption>An elderly beneficiary beside the Emergency Relief for Pandharpur Warkari banner, kits stacked behind her at the halt</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-13.jpg" alt=""><figcaption>Two women helping each other along a rocky patch of ground, flags planted upright beside them</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-14.jpg" alt=""><figcaption>A broad smile under the white Gandhi cap — one face among the hundreds who made the walk</figcaption></figure>
+    <figure><img loading="lazy" src="images/dash/smiles-15.jpg" alt=""><figcaption>A quiet toast with a cup of water, shared and smiling at a roadside stop</figcaption></figure>
+  </div>
+</div></section>
+
+<!-- ===== TEAM & PARTNERS (structure pass) ===== -->
+<section class="tab" id="t-team"><div class="wrap" style="padding-top:30px;">
+  <div class="eyebrow">The people behind the work</div>
+  <h1 class="headline" style="font-size:28px;">Team &amp; partners</h1>
+  <div class="team-grid">
+    <div class="team-card">
+      <img loading="lazy" src="images/dash/team-ranjita-pawar.jpg" alt="Ranjita Pawar">
+      <div class="t-name">Ranjita Pawar</div>
+      <div class="t-role">Team Leader</div>
+    </div>
+    <div class="team-card">
+      <img loading="lazy" src="images/dash/team-prem-rathod.jpg" alt="Prem Rathod">
+      <div class="t-name">Prem Rathod</div>
+      <div class="t-role">Field Organiser</div>
+    </div>
+    <div class="team-card">
+      <img loading="lazy" src="images/dash/team-rohit-chavan.jpg" alt="Rohit Chavan">
+      <div class="t-name">Rohit Chavan</div>
+      <div class="t-role">Enumerator — registering beneficiary names</div>
+    </div>
+    <div class="team-card">
+      <img loading="lazy" src="images/dash/team-shatrughan-pawar.jpg" alt="Shatrughan Pawar">
+      <div class="t-name">Shatrughan Pawar</div>
+      <div class="t-role">Logistics Arrangement</div>
+    </div>
+    <div class="team-card">
+      <img loading="lazy" src="images/dash/team-rajendra-jadhav.jpg" alt="Rajendra Jadhav">
+      <div class="t-name">Rajendra Jadhav</div>
+      <div class="t-role">Photographer &amp; Documentation</div>
+    </div>
+  </div>
+  <h2 class="sec">Made possible by</h2>
+  <div class="partners">
+    <div class="p-card"><div class="role">Donated by</div><img loading="lazy" src="images/dash/amazon-logo.png" alt="Amazon"></div>
+    <div class="p-card"><div class="role">Through</div><img loading="lazy" src="images/dash/donatekart-logo.png" alt="DonateKart Foundation"></div>
+    <div class="p-card"><div class="role">Implementation Partner</div><img loading="lazy" src="images/dash/samarthya-logo.png" alt="Samarthya" style="max-height:44px;"></div>
+  </div>
+</div></section>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Enlarged photograph">
+  <button class="lb-close" id="lbClose" aria-label="Close enlarged photo">&#10005;</button>
+  <img class="lb-img" id="lbImg" src="" alt="">
+  <div class="lb-cap" id="lbCap"></div>
+</div>
+
+<footer>Samarthya Kalyankari Sanstha · Warkari Flood Emergency Response · Palkhi Route, Maharashtra · July 2026 · Donated by Amazon · Through DonateKart Foundation</footer>
 
 <script>
-const GROUPS = [
-  { id: 'group-emergency', label: 'Group A — Emergency, Logistics & Route', slugs: ['when-rains-came','transportation','samarthya-team-demo'] },
-  { id: 'group-verification', label: 'Group B — Verification & Accountability', slugs: ['dindi-schedule-scans','beneficiaries-with-kits'] },
-  { id: 'group-impact', label: 'Group C — Human Impact & Credits', slugs: ['what-a-kit-became','human-smiles','team-credits'] },
+/* ---------- LIGHTBOX ---------- */
+(function(){
+  const lb    = document.getElementById('lb');
+  const lbImg = document.getElementById('lbImg');
+  const lbCap = document.getElementById('lbCap');
+  let lastFocused = null;
+
+  function openLB(src, caption, altText){
+    lastFocused = document.activeElement;
+    lbImg.src = src;
+    lbImg.alt = altText || caption || '';
+    lbCap.textContent = caption || '';
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('lbClose').focus();
+  }
+  function closeLB(){
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    // release the (potentially large) image so it isn't held in the overlay
+    setTimeout(() => { if (!lb.classList.contains('open')) lbImg.removeAttribute('src'); }, 250);
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
+  }
+
+  // Wire every gallery thumbnail across all tabs
+  document.querySelectorAll('.strip img').forEach(img => {
+    img.addEventListener('click', () => {
+      const cap = img.closest('figure')?.querySelector('figcaption')?.textContent || '';
+      openLB(img.currentSrc || img.src, cap, img.alt);
+    });
+  });
+
+  document.getElementById('lbClose').addEventListener('click', closeLB);
+  // click anywhere outside the image (backdrop or caption area) dismisses
+  lb.addEventListener('click', e => { if (e.target !== lbImg) closeLB(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && lb.classList.contains('open')) closeLB();
+  });
+})();
+document.querySelectorAll('.nb').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.nb').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on2'));
+  b.classList.add('on');
+  document.getElementById('t-'+b.dataset.t).classList.add('on2');
+  window.scrollTo({top:0});
+  if (b.dataset.t === 'route'){
+    if (!window._mapInit){ initMap(); window._mapInit = true; }
+    else { setTimeout(() => window._map && window._map.invalidateSize(), 50); }
+  }
+}));
+
+/* ---------- ROUTE MAP (Gate 4 build — markers, polylines, hosted photos unchanged) ---------- */
+const CLUSTERS = [
+ {id:1,dayn:1,day:'16 Jul',t:'11:31–11:53',lat:18.63999,lon:74.44764,photos:4,name:'Shirur / Nimgaon Mude / Karegaon',img:'IMG_4642'},
+ {id:2,dayn:1,day:'16 Jul',t:'16:07',lat:18.37323,lon:74.64092,photos:3,name:'Daund / Kurkumbh / Patas area',img:'IMG_5093'},
+ {id:3,dayn:1,day:'16 Jul',t:'16:48–17:07',lat:18.35272,lon:74.64885,photos:5,name:'Daund / Kurkumbh / Patas area',img:'IMG_5242'},
+ {id:4,dayn:1,day:'16 Jul',t:'17:56–17:59',lat:18.36384,lon:74.61643,photos:11,name:'Shirsuphal / Supe / Vasunde area',img:'IMG_5391'},
+ {id:5,dayn:1,day:'16 Jul',t:'18:07–18:21',lat:18.383,lon:74.58205,photos:7,name:'Shirsuphal / Supe / Vasunde area',img:'IMG_5422'},
+ {id:6,dayn:2,day:'17 Jul',t:'11:08',lat:18.09539,lon:74.21349,photos:1,name:'Shirwal / Lonand / Nira area',img:'IMG_5475'},
+ {id:7,dayn:2,day:'17 Jul',t:'12:12',lat:18.01216,lon:74.24872,photos:1,name:'Shirwal / Lonand / Nira area',img:null},
+ {id:8,dayn:2,day:'17 Jul',t:'12:42',lat:17.96335,lon:74.32761,photos:1,name:'Phaltan / Vidni / Taradgaon',img:null},
+ {id:9,dayn:2,day:'17 Jul',t:'13:29',lat:17.99977,lon:74.38022,photos:1,name:'Phaltan / Vidni / Taradgaon',img:null},
+ {id:10,dayn:2,day:'17 Jul',t:'13:57–14:37',lat:17.98302,lon:74.4269,photos:5,name:'Phaltan / Vidni / Taradgaon',img:'IMG_5538'},
+ {id:11,dayn:2,day:'17 Jul',t:'15:22',lat:17.97886,lon:74.42906,photos:1,name:'Phaltan (same halt, revisited)',img:null},
+ {id:12,dayn:2,day:'17 Jul',t:'16:06',lat:17.97834,lon:74.42889,photos:1,name:'Phaltan (same halt, revisited)',img:null},
+ {id:13,dayn:2,day:'17 Jul',t:'18:21',lat:18.34966,lon:74.38101,photos:1,name:'Supe / Kutwalwadi / Pargaon',img:null},
 ];
-
-let manifest = null;
-let flatPhotos = []; // for lightbox nav: [{catSlug, idx}]
-let currentFlatIndex = 0;
-
-async function init(){
-  const res = await fetch('manifest.json');
-  manifest = await res.json();
-
-  const totalPhotos = manifest.categories.reduce((s,c) => s + c.count, 0);
-  document.getElementById('headerStats').innerHTML = `
-    <div class="stat"><b>${totalPhotos}</b>photos</div>
-    <div class="stat"><b>${manifest.categories.length}</b>categories</div>
-    <div class="stat"><b>3</b>groups</div>
-  `;
-
-  const main = document.getElementById('main');
-  const byslug = {};
-  manifest.categories.forEach(c => byslug[c.slug] = c);
-
-  GROUPS.forEach(group => {
-    const section = document.createElement('section');
-    section.className = 'group';
-    section.id = group.id;
-    const head = document.createElement('div');
-    head.className = 'group-head';
-    head.innerHTML = `<div class="g-label">${group.label.split(' — ')[0]}</div><h2>${group.label.split(' — ')[1]}</h2>`;
-    section.appendChild(head);
-
-    group.slugs.forEach(slug => {
-      const cat = byslug[slug];
-      if (!cat) return;
-      const catEl = document.createElement('div');
-      catEl.className = 'category';
-      catEl.innerHTML = `
-        <div class="category-head">
-          <h3>${cat.title}</h3>
-          <span class="count">${cat.count} photo${cat.count!==1?'s':''}</span>
-        </div>
-        <p class="category-sub">${cat.subtitle}</p>
-        <div class="grid" id="grid-${cat.slug}"></div>
-      `;
-      section.appendChild(catEl);
-    });
-    main.appendChild(section);
+function catmull(points, seg=14){
+  if (points.length < 3) return points;
+  const get = i => points[Math.max(0, Math.min(points.length-1, i))];
+  const out = [];
+  for (let i=0;i<points.length-1;i++){
+    const p0=get(i-1),p1=get(i),p2=get(i+1),p3=get(i+2);
+    for (let s=0;s<seg;s++){
+      const t=s/seg,t2=t*t,t3=t2*t;
+      out.push([
+        .5*((2*p1[0])+(-p0[0]+p2[0])*t+(2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2+(-p0[0]+3*p1[0]-3*p2[0]+p3[0])*t3),
+        .5*((2*p1[1])+(-p0[1]+p2[1])*t+(2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2+(-p0[1]+3*p1[1]-3*p2[1]+p3[1])*t3)
+      ]);
+    }
+  }
+  out.push(points[points.length-1]);
+  return out;
+}
+function initMap(){
+  const map = L.map('routemap', { scrollWheelZoom:false });
+  window._map = map;
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom:19
+  }).addTo(map);
+  const d1 = CLUSTERS.filter(c=>c.dayn===1).map(c=>[c.lat,c.lon]);
+  const d2raw = CLUSTERS.filter(c=>c.dayn===2).map(c=>[c.lat,c.lon]);
+  const BARAMATI = [18.15,74.578];
+  const d2 = [...d2raw.slice(0,-1), BARAMATI, d2raw[d2raw.length-1]];
+  L.polyline(catmull(d1), {color:'#E67E22',weight:4.5,opacity:.9,lineJoin:'round'}).addTo(map);
+  L.polyline(catmull(d2), {color:'#C0392B',weight:4.5,opacity:.9,lineJoin:'round'}).addTo(map);
+  const nudge = {11:[.006,.004],12:[.012,.008]};
+  CLUSTERS.forEach(c=>{
+    const color = c.dayn===1 ? '#E67E22' : '#C0392B';
+    const r = Math.round(18 + Math.sqrt(c.photos)*6);
+    let lat=c.lat, lon=c.lon;
+    if (nudge[c.id]){ lat+=nudge[c.id][1]; lon+=nudge[c.id][0]; }
+    const inner = c.img ? `<img src="images/map-markers/${c.img}_thumb.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '';
+    const html = `<div style="width:${r}px;height:${r}px;border-radius:50%;background:${c.img?'#fff':color};border:3px solid ${color};position:relative;box-shadow:0 2px 8px rgba(0,0,0,.35);">${inner}<div style="position:absolute;top:-7px;right:-7px;width:19px;height:19px;border-radius:50%;background:#232F3E;color:#fff;font:600 10px 'Work Sans',sans-serif;display:flex;align-items:center;justify-content:center;border:1.5px solid #F7F9FC;">${c.id}</div></div>`;
+    const icon = L.divIcon({html, className:'', iconSize:[r,r], iconAnchor:[r/2,r/2]});
+    const m = L.marker([lat,lon],{icon,zIndexOffset:1000}).addTo(map);
+    const popImg = c.img ? `<img src="images/map-markers/${c.img}_modal.jpg" style="width:240px;border-radius:6px;display:block;margin-bottom:8px;">` : '';
+    m.bindPopup(`${popImg}<b>Halt #${c.id} — ${c.name}</b><br><span style="font:11px 'Work Sans',sans-serif;color:#6B7684;">${c.day} · ${c.t} · ${c.photos} photo${c.photos!==1?'s':''} geotagged</span>`);
   });
-
-  // populate grids + build flat photo list for lightbox
-  manifest.categories.forEach(cat => {
-    const grid = document.getElementById(`grid-${cat.slug}`);
-    cat.photos.forEach((photo, i) => {
-      const item = document.createElement('div');
-      item.className = 'grid-item';
-      const img = document.createElement('img');
-      img.src = photo.thumb;
-      img.loading = 'lazy';
-      img.alt = `${cat.title} photo ${i+1}`;
-      img.addEventListener('load', () => img.classList.add('loaded'));
-      item.appendChild(img);
-      const flatIdx = flatPhotos.length;
-      flatPhotos.push({ catSlug: cat.slug, catTitle: cat.title, full: photo.full, idx: i });
-      item.addEventListener('click', () => openLightbox(flatIdx));
-      grid.appendChild(item);
-    });
-  });
+  map.fitBounds(CLUSTERS.map(c=>[c.lat,c.lon]), {padding:[36,36]});
+  setTimeout(()=>map.invalidateSize(), 300);
 }
-
-// ---------- LIGHTBOX ----------
-const lightbox = document.getElementById('lightbox');
-const lbImg = document.getElementById('lbImg');
-const lbCounter = document.getElementById('lbCounter');
-
-function openLightbox(flatIdx){
-  currentFlatIndex = flatIdx;
-  renderLightbox();
-  lightbox.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function renderLightbox(){
-  const p = flatPhotos[currentFlatIndex];
-  lbImg.src = p.full;
-  lbImg.alt = p.catTitle;
-  lbCounter.textContent = `${p.catTitle} — ${p.idx+1} / ${flatPhotos.filter(x=>x.catSlug===p.catSlug).length}`;
-}
-function closeLightbox(){
-  lightbox.classList.remove('open');
-  document.body.style.overflow = '';
-}
-function navLightbox(dir){
-  // navigate within same category only, wrapping
-  const cur = flatPhotos[currentFlatIndex];
-  const sameCat = flatPhotos.map((p,i)=>({...p,i})).filter(p => p.catSlug === cur.catSlug);
-  const posInCat = sameCat.findIndex(p => p.i === currentFlatIndex);
-  const nextPos = (posInCat + dir + sameCat.length) % sameCat.length;
-  currentFlatIndex = sameCat[nextPos].i;
-  renderLightbox();
-}
-document.getElementById('lbClose').addEventListener('click', closeLightbox);
-document.getElementById('lbPrev').addEventListener('click', () => navLightbox(-1));
-document.getElementById('lbNext').addEventListener('click', () => navLightbox(1));
-lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
-document.addEventListener('keydown', (e) => {
-  if (!lightbox.classList.contains('open')) return;
-  if (e.key === 'Escape') closeLightbox();
-  if (e.key === 'ArrowLeft') navLightbox(-1);
-  if (e.key === 'ArrowRight') navLightbox(1);
-});
-
-init();
 </script>
 </body>
 </html>

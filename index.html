@@ -188,8 +188,10 @@ h2.sec{font-family:'Fraunces',serif;font-weight:700;font-size:22px;color:var(--n
   border:1px solid var(--border);
   padding:6px;
 }
-/* Portrait variant — sources are pre-cropped to 3:4, so cover adds no further crop. */
-.strip.strip-portrait{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+/* Portrait variant — sources are pre-cropped to 3:4, so cover adds no further crop.
+   Min tile matches .strip-5 (185px) so portraits keep the same 5-across rhythm
+   as every other gallery on the page. */
+.strip.strip-portrait{grid-template-columns:repeat(auto-fill,minmax(185px,1fr));}
 .strip.strip-portrait img{aspect-ratio:3/4;}
 
 /* ---------- other tabs (lighter pass, structure only) ---------- */

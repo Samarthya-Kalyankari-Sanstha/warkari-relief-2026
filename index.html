@@ -8,6 +8,8 @@
 <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="images/favicon/favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="64x64" href="images/favicon/favicon-64x64.png">
+<link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png">
 <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-chrome-192x192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="images/favicon/android-chrome-512x512.png">
@@ -236,6 +238,36 @@ table.roster td:last-child{color:var(--muted);}
 .p-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;}
 .p-card img{max-height:34px;margin:6px auto 0;display:block;}
 .p-card .role{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+
+/* ---------- WHO WE ARE ---------- */
+.about-card{
+  background:var(--card);border:1px solid var(--border);border-left:4px solid var(--orange);
+  border-radius:var(--r);padding:24px 26px;margin:16px 0 30px;
+}
+.about-card p{font-size:13.5px;line-height:1.75;color:var(--text);margin:0 0 14px;}
+.about-card p:last-child{margin-bottom:0;}
+.about-stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:14px;
+  margin:18px 0;padding:16px 0;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.about-stats .as-n{font-family:'Fraunces',serif;font-weight:700;font-size:21px;color:var(--navy);line-height:1.1;}
+.about-stats .as-l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px;}
+.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin:14px 0 18px;}
+.pillar{background:var(--navy-lt);border:1px solid transparent;border-radius:8px;padding:12px 14px;}
+.pillar.current{background:rgba(217,119,6,.10);border-color:rgba(217,119,6,.32);}
+.pillar .pl-name{font-family:'Work Sans',sans-serif;font-weight:700;font-size:12.5px;color:var(--navy);}
+.pillar .pl-mr{font-family:'Noto Sans Devanagari',sans-serif;font-weight:600;color:var(--navy);}
+.pillar .pl-en{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4;}
+.pillar .pl-tag{
+  display:inline-block;margin-top:6px;font-size:9.5px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:#92400E;
+}
+.about-link{
+  font-family:'Work Sans',sans-serif;font-weight:600;color:#92400E;
+  text-decoration:none;border-bottom:1px solid rgba(217,119,6,.45);
+}
+.about-link:hover{border-bottom-color:#92400E;}
 
 .route-split{
   display:flex;
@@ -837,6 +869,28 @@ footer{text-align:center;padding:26px 18px 36px;color:var(--muted);font-size:11.
     <div class="p-card"><div class="role">Donated by</div><a class="logo-link" href="https://www.aboutamazon.in/impact/community" target="_blank" rel="noopener noreferrer" title="Amazon — Community Impact" aria-label="Amazon Community Impact website, opens in a new tab"><img loading="lazy" src="images/dash/amazon-logo.png" alt="Amazon"></a></div>
     <div class="p-card"><div class="role">Through</div><a class="logo-link" href="https://donatekart.org.in/" target="_blank" rel="noopener noreferrer" title="DonateKart Foundation — donatekart.org.in" aria-label="DonateKart Foundation website, opens in a new tab"><img loading="lazy" src="images/dash/donatekart-logo.png" alt="DonateKart Foundation"></a></div>
     <div class="p-card"><div class="role">Implementation Partner</div><a class="logo-link" href="https://www.mahasamarthya.org/" target="_blank" rel="noopener noreferrer" title="Samarthya Kalyankari Sanstha — mahasamarthya.org" aria-label="Samarthya Kalyankari Sanstha website, opens in a new tab"><img loading="lazy" src="images/dash/samarthya-logo.png" alt="Samarthya" style="max-height:44px;"></a></div>
+  </div>
+
+  <h2 class="sec">Who we are</h2>
+  <div class="about-card">
+    <p>Samarthya Kalyankari Sanstha is a youth-founded, women-led grassroots organisation rooted in Dharashiv (Osmanabad), Maharashtra, with work extending to Pune and Raigad districts. We stand alongside De-notified and Nomadic Tribes (DNT) and Particularly Vulnerable Tribal Groups (PVTG) — communities that have carried the weight of historical stigma and systemic exclusion for generations, yet continue to organise, lead, and claim what is rightfully theirs.</p>
+    <p>Since 2008, our work has grown from a small group of young people challenging alcoholism and violence in their own <i>tanda</i>, into an organisation reaching 36,960+ women and 49,280+ children across 140+ villages.</p>
+    <div class="about-stats">
+      <div><div class="as-n">2008</div><div class="as-l">Working since</div></div>
+      <div><div class="as-n">36,960+</div><div class="as-l">Women reached</div></div>
+      <div><div class="as-n">49,280+</div><div class="as-l">Children reached</div></div>
+      <div><div class="as-n">140+</div><div class="as-l">Villages</div></div>
+    </div>
+    <p>Our work is organised across five pillars:</p>
+    <div class="pillars">
+      <div class="pillar"><div class="pl-name">Bharari <span class="pl-mr">भरारी</span></div><div class="pl-en">Gender Justice</div></div>
+      <div class="pillar"><div class="pl-name">Saksham Shikshan <span class="pl-mr">सक्षम शिक्षण</span></div><div class="pl-en">Quality Education</div></div>
+      <div class="pillar"><div class="pl-name">Umed <span class="pl-mr">उमेद</span></div><div class="pl-en">Youth Leadership</div></div>
+      <div class="pillar"><div class="pl-name">Swayampurn <span class="pl-mr">स्वयंपूर्ण</span></div><div class="pl-en">Community Development</div></div>
+      <div class="pillar current"><div class="pl-name">Madat <span class="pl-mr">मदत</span></div><div class="pl-en">Disaster Emergency Response and Relief</div><span class="pl-tag">This programme</span></div>
+    </div>
+    <p>Together, these pillars build a community's capacity to lead its own transformation — at the individual, community, and systemic level.</p>
+    <p>We invite you to learn more about our work, visit our communities, and walk with us. For more details, visit <a class="about-link" href="https://www.mahasamarthya.org/" target="_blank" rel="noopener noreferrer">mahasamarthya.org</a>.</p>
   </div>
 </div></section>
 

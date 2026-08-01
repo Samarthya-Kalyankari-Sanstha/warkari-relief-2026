@@ -74,6 +74,9 @@ img{max-width:100%;}
 .mh-attr{display:flex;align-items:center;gap:8px;}
 .mh-attr .lbl{font-family:'Work Sans',sans-serif;font-size:11px;font-style:italic;color:var(--muted);}
 .mh-attr .logo-plain{height:32px;width:auto;object-fit:contain;display:block;}
+/* Organisation logos link out to their own websites */
+.logo-link{display:block;line-height:0;border-radius:4px;transition:opacity .15s ease;}
+.logo-link:hover{opacity:.68;}
 .mh-verified-pill{
   background:var(--navy);color:#fff;font-family:'Work Sans',sans-serif;
   font-size:11px;font-weight:700;letter-spacing:.03em;
@@ -403,17 +406,17 @@ footer{text-align:center;padding:26px 18px 36px;color:var(--muted);font-size:11.
 <div class="masthead">
     <div class="mh-left">
       <span class="partner-label">IMPLEMENTATION PARTNER</span>
-      <img loading="lazy" src="images/dash/samarthya-logo.png" alt="Samarthya" class="logo-plain">
+      <a class="logo-link" href="https://www.mahasamarthya.org/" target="_blank" rel="noopener noreferrer" title="Samarthya Kalyankari Sanstha — mahasamarthya.org" aria-label="Samarthya Kalyankari Sanstha website, opens in a new tab"><img loading="lazy" src="images/dash/samarthya-logo.png" alt="Samarthya" class="logo-plain"></a>
       <div class="prog"><b>Madat Programme</b>Warkari Flood Emergency Response · Pune · July 2026</div>
     </div>
     <div class="mh-right">
       <div class="mh-attr">
         <span class="lbl">Donated by</span>
-        <img loading="lazy" src="images/dash/amazon-logo.png" alt="Amazon" class="logo-plain">
+        <a class="logo-link" href="https://www.aboutamazon.in/impact/community" target="_blank" rel="noopener noreferrer" title="Amazon — Community Impact" aria-label="Amazon Community Impact website, opens in a new tab"><img loading="lazy" src="images/dash/amazon-logo.png" alt="Amazon" class="logo-plain"></a>
       </div>
       <div class="mh-attr">
         <span class="lbl">Through</span>
-        <img loading="lazy" src="images/dash/donatekart-logo.png" alt="DonateKart Foundation" class="logo-plain">
+        <a class="logo-link" href="https://donatekart.org.in/" target="_blank" rel="noopener noreferrer" title="DonateKart Foundation — donatekart.org.in" aria-label="DonateKart Foundation website, opens in a new tab"><img loading="lazy" src="images/dash/donatekart-logo.png" alt="DonateKart Foundation" class="logo-plain"></a>
       </div>
       <div class="mh-verified-pill">GPS-VERIFIED · JULY 2026</div>
     </div>
@@ -831,9 +834,9 @@ footer{text-align:center;padding:26px 18px 36px;color:var(--muted);font-size:11.
   </div>
   <h2 class="sec">Made possible by</h2>
   <div class="partners">
-    <div class="p-card"><div class="role">Donated by</div><img loading="lazy" src="images/dash/amazon-logo.png" alt="Amazon"></div>
-    <div class="p-card"><div class="role">Through</div><img loading="lazy" src="images/dash/donatekart-logo.png" alt="DonateKart Foundation"></div>
-    <div class="p-card"><div class="role">Implementation Partner</div><img loading="lazy" src="images/dash/samarthya-logo.png" alt="Samarthya" style="max-height:44px;"></div>
+    <div class="p-card"><div class="role">Donated by</div><a class="logo-link" href="https://www.aboutamazon.in/impact/community" target="_blank" rel="noopener noreferrer" title="Amazon — Community Impact" aria-label="Amazon Community Impact website, opens in a new tab"><img loading="lazy" src="images/dash/amazon-logo.png" alt="Amazon"></a></div>
+    <div class="p-card"><div class="role">Through</div><a class="logo-link" href="https://donatekart.org.in/" target="_blank" rel="noopener noreferrer" title="DonateKart Foundation — donatekart.org.in" aria-label="DonateKart Foundation website, opens in a new tab"><img loading="lazy" src="images/dash/donatekart-logo.png" alt="DonateKart Foundation"></a></div>
+    <div class="p-card"><div class="role">Implementation Partner</div><a class="logo-link" href="https://www.mahasamarthya.org/" target="_blank" rel="noopener noreferrer" title="Samarthya Kalyankari Sanstha — mahasamarthya.org" aria-label="Samarthya Kalyankari Sanstha website, opens in a new tab"><img loading="lazy" src="images/dash/samarthya-logo.png" alt="Samarthya" style="max-height:44px;"></a></div>
   </div>
 </div></section>
 
